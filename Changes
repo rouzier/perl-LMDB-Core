@@ -1,0 +1,6 @@
+Revision history for Perl extension LMDB::Core.
+
+0.01  Fri Mar 13 18:57:48 2015
+	- original version; created by h2xs 1.23 with options
+		-n LMDB::Core
+
