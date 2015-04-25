@@ -420,7 +420,7 @@ mdb_get(txn, dbi, key, data)
     data
 
 int
-mdb_put(txn, dbi, key, data, flags)
+mdb_put(txn, dbi, key, data, flags = 0)
     LMDB::Core::Txn txn
     unsigned int dbi
     MDB_valIn &key
