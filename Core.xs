@@ -80,7 +80,7 @@ unsigned int numreaders(envinfo)
 void DESTROY(envinfo)
 	LMDB::Core::EnvInfo envinfo
     CODE:
-    free(envinfo);
+    Safefree(envinfo);
 
 MODULE = LMDB::Core		PACKAGE = LMDB::Core::Stat
 
@@ -129,7 +129,7 @@ size_t entries(stat)
 void DESTROY(stat)
     LMDB::Core::Stat stat
     CODE:
-    free(stat);
+    Safefree(stat);
 
 
 MODULE = LMDB::Core		PACKAGE = LMDB::Core		
@@ -189,7 +189,7 @@ int  mdb_env_stat(env, stat)
     LMDB::Core::Env env
     LMDB::Core::Stat stat = NO_INIT
     INIT:
-    stat = (MDB_stat*)malloc(sizeof(MDB_stat));
+    Newx(stat, 1, MDB_stat);
     CODE:
     RETVAL = mdb_env_stat(env,stat);
     OUTPUT:
@@ -200,7 +200,7 @@ int  mdb_env_info(env,envinfo)
     LMDB::Core::Env env
     LMDB::Core::EnvInfo envinfo = NO_INIT
     INIT:
-    envinfo = (MDB_envinfo*)malloc(sizeof(MDB_envinfo));
+    Newx(envinfo, 1, MDB_envinfo);
     CODE:
     RETVAL = mdb_env_info(env,envinfo);
     OUTPUT:
@@ -343,10 +343,11 @@ mdb_stat(txn, dbi, stat);
     int dbi
     LMDB::Core::Stat stat = NO_INIT
     INIT:
-    stat = (MDB_stat*)malloc(sizeof(MDB_stat));
+    Newx(stat, 1, MDB_stat);
     CODE:
     RETVAL = mdb_stat(txn,dbi,stat);
     OUTPUT:
+    stat
     RETVAL
 
 int
