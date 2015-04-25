@@ -9533,6 +9533,15 @@ int mdb_set_cmpctx(MDB_txn *txn, MDB_dbi dbi, void *ctx)
 	return MDB_SUCCESS;
 }
 
+int mdb_set_dcmpctx(MDB_txn *txn, MDB_dbi dbi, void *ctx)
+{
+	if (dbi == FREE_DBI || !TXN_DBI_EXIST(txn, dbi))
+		return EINVAL;
+
+	txn->mt_dbxs[dbi].md_dcmpctx = ctx;
+	return MDB_SUCCESS;
+}
+
 int ESECT
 mdb_env_get_maxkeysize(MDB_env *env)
 {
