@@ -23,6 +23,15 @@ typedef MDB_stat*   LMDB__Core__Stat;
 typedef MDB_val     MDB_valIn;
 typedef MDB_val     MDB_valInOut;
 
+#define MY_CXT_KEY  "LMDB::Core::_guts" XS_VERSION
+
+typedef struct {
+    SV *my_asv;
+    SV *my_bsv;
+} my_cxt_t;
+
+START_MY_CXT
+
 static int  LMDB_Core_cmp(const MDB_val *a, const MDB_val *b, void * ctx) {
     SV* method = (SV*) ctx;
     dTHX;
@@ -382,6 +391,7 @@ mdb_set_compare(txn, dbi, cmp)
                unsigned int dbi
                SV *cmp 
     CODE:
+    SvREFCNT_inc(cmp);
     mdb_set_cmpctx(txn, dbi, (void *)cmp);
     RETVAL = mdb_set_compare(txn, dbi, LMDB_Core_cmp);
     OUTPUT:
@@ -516,3 +526,13 @@ mdb_reader_check(env, dead)
     LMDB::Core::Env env
     int &dead = NO_INIT
 
+void CLONE()
+    CODE:
+    MY_CXT_CLONE;
+    MY_CXT.my_asv = get_sv("::a", GV_ADDMULTI);
+    MY_CXT.my_bsv = get_sv("::b", GV_ADDMULTI);
+
+BOOT:
+    MY_CXT_INIT;
+    MY_CXT.my_asv = get_sv("::a", GV_ADDMULTI);
+    MY_CXT.my_bsv = get_sv("::b", GV_ADDMULTI);
