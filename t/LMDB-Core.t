@@ -5,7 +5,7 @@
 
 # change 'tests => 1' to 'tests => last_test_to_print';
 
-use Test::More tests => 9;
+use Test::More tests => 16;
 BEGIN { use_ok('LMDB::Core') };
 
 #########################
@@ -33,3 +33,36 @@ $rc = LMDB::Core::mdb_env_open($env,"tempdb");
 
 is($rc,0,"mdb_env_open");
 
+$rc = LMDB::Core::mdb_txn_begin($env, undef, 0, my $txn);
+
+is($rc,0,"mdb_txn_begin");
+
+isa_ok($txn,"LMDB::Core::Txn","Isa LMDB::Core::Txn");
+
+my $rc = LMDB::Core::mdb_dbi_open($txn,undef,0,$dbi);
+
+is($rc,0,"mdb_dbi_open");
+
+my $rc = LMDB::Core::mdb_put($txn,$dbi,"bob", "jones",0);
+
+is($rc,0,"mdb_put");
+
+$rc = LMDB::Core::mdb_txn_commit($txn);
+
+is($rc,0,"mdb_txn_commit");
+
+$rc = LMDB::Core::mdb_txn_begin($env, undef, 0, $txn);
+
+my $key = "bob";
+my $data;
+
+my $rc = LMDB::Core::mdb_get($txn,$dbi,$key,$data);
+
+is($rc,0,"mdb_get");
+
+is($data,"jones","mdb_get back");
+
+
+
+
+LMDB::Core::mdb_env_close($env);
