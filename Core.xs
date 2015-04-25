@@ -454,11 +454,15 @@ unsigned int
 mdb_cursor_dbi(cursor)
 	LMDB::Core::Cursor	cursor
 
-=begin
+int
+mdb_cursor_get(cursor, key, data, MDB_cursor_op op)
+    LMDB::Core::Cursor cursor
+    MDB_valInOut &key
+    MDB_valInOut &data
+    OUTPUT:
+    key
+    data
 
-int  mdb_cursor_get(MDB_cursor *cursor, MDB_val *key, MDB_val *data, MDB_cursor_op op);
-
-=cut
 
 int
 mdb_cursor_put(cursor, key, data, flags)

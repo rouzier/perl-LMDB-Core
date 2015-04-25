@@ -9,6 +9,7 @@ TxnOrNull     T_PTROBJ_N
 MDB_dbi     unsigned int
 MDB_valIn   T_mdb_val_in
 MDB_valInOut   T_mdb_val_in_out
+MDB_cursor_op T_UV
 
 INPUT
 
