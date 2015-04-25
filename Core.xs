@@ -212,6 +212,10 @@ mdb_env_sync(env, force=0)
 	LMDB::Core::Env   env
 	int	force
 
+void
+mdb_env_close(env)
+	LMDB::Core::Env   env
+
 int
 mdb_env_set_flags(env, flags, onoff)
 	LMDB::Core::Env   env
