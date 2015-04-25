@@ -4,9 +4,16 @@
 
 #include "ppport.h"
 
+#include <liblmdb/lmdb.h>
+
 #include "const-c.inc"
 
-#include <liblmdb/lmdb.h>
+#if PERL_VERSION >= 18
+# define SvTRULYREADONLY(sv) SvREADONLY(sv)
+#else
+# define SvTRULYREADONLY(sv) (SvREADONLY(sv) && !SvIsCOW(sv))
+#endif
+
 typedef	MDB_env*    LMDB__Core__Env;
 typedef	MDB_envinfo*    LMDB__Core__EnvInfo;
 typedef	MDB_txn*    LMDB__Core__Txn;
