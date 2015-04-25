@@ -14,6 +14,7 @@ typedef MDB_txn*     TxnOrNull;
 typedef MDB_cursor* LMDB__Core__Cursor;
 typedef MDB_stat*   LMDB__Core__Stat;
 typedef MDB_val     MDB_valIn;
+typedef MDB_val     MDB_valInOut;
 
 static int  LMDB_Core_cmp(const MDB_val *a, const MDB_val *b, void * ctx) {
     SV* method = (SV*) ctx;
@@ -394,9 +395,17 @@ int  mdb_set_relctx(MDB_txn *txn, MDB_dbi dbi, void *ctx);
 
 =begin
 
-int  mdb_get(MDB_txn *txn, MDB_dbi dbi, MDB_val *key, MDB_val *data);
 
 =cut
+int
+mdb_get(txn, dbi, key, data)
+    LMDB::Core::Txn txn
+    unsigned int dbi
+    MDB_valInOut &key
+    MDB_valInOut &data
+    OUTPUT:
+    key
+    data
 
 int
 mdb_put(txn, dbi, key, data, flags)
