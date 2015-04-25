@@ -124,7 +124,7 @@ sub MY::postamble {
     if ($^O =~ /MSWin32/ && !defined($ENV{SYSTEMROOT})) {
         if ($Config{'make'} =~ /dmake/i) {
             return <<'EOT';
-$(MYEXTLIB): liblmdb/Makefile
+$(MYEXTLIB): liblmdb/mdb.c liblmdb/lmdb.h
 @[
 	cd liblmdb
 	$(MAKE) XCFLAGS=-fPIC liblmdb$(LIB_EXT)
@@ -134,7 +134,7 @@ EOT
         }
         elsif ($Config{'make'} =~ /nmake/i) {
             return <<'EOT';
-$(MYEXTLIB): liblmdb/Makefile
+$(MYEXTLIB): liblmdb/mdb.c liblmdb/lmdb.h
 	cd liblmdb
 	$(MAKE) XCFLAGS=-fPIC liblmdb$(LIB_EXT)
 	cd ..
@@ -143,7 +143,7 @@ EOT
     }
     else {
         return <<'EOT';
-$(MYEXTLIB): liblmdb/Makefile
+$(MYEXTLIB): liblmdb/mdb.c liblmdb/lmdb.h
 	cd liblmdb && $(MAKE) XCFLAGS=-fPIC liblmdb$(LIB_EXT)
 EOT
     }
