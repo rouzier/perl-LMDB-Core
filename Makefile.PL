@@ -20,6 +20,7 @@ WriteMakefile(
     INC    => '-I. ',    # e.g., '-I. -I/usr/include/other'
                          # Un-comment this if you add C files to link with later:
                          # OBJECT            => '$(O_FILES)', # link all the C files too
+    realclean       => { FILES => 'const-*.inc' }
 );
 if (eval {require ExtUtils::Constant; 1}) {
 
@@ -43,30 +44,18 @@ if (eval {require ExtUtils::Constant; 1}) {
           MDB_DBS_FULL
           MDB_DUPFIXED
           MDB_DUPSORT
-          MDB_FIRST
-          MDB_FIRST_DUP
           MDB_FIXEDMAP
-          MDB_GET_BOTH
-          MDB_GET_BOTH_RANGE
-          MDB_GET_CURRENT
-          MDB_GET_MULTIPLE
           MDB_INCOMPATIBLE
           MDB_INTEGERDUP
           MDB_INTEGERKEY
           MDB_INVALID
           MDB_KEYEXIST
-          MDB_LAST
-          MDB_LAST_DUP
           MDB_LAST_ERRCODE
           MDB_MAPASYNC
           MDB_MAP_FULL
           MDB_MAP_RESIZED
           MDB_MAXKEYSIZE
           MDB_MULTIPLE
-          MDB_NEXT
-          MDB_NEXT_DUP
-          MDB_NEXT_MULTIPLE
-          MDB_NEXT_NODUP
           MDB_NODUPDATA
           MDB_NOLOCK
           MDB_NOMEMINIT
@@ -80,17 +69,11 @@ if (eval {require ExtUtils::Constant; 1}) {
           MDB_PAGE_FULL
           MDB_PAGE_NOTFOUND
           MDB_PANIC
-          MDB_PREV
-          MDB_PREV_DUP
-          MDB_PREV_NODUP
           MDB_RDONLY
           MDB_READERS_FULL
           MDB_RESERVE
           MDB_REVERSEDUP
           MDB_REVERSEKEY
-          MDB_SET
-          MDB_SET_KEY
-          MDB_SET_RANGE
           MDB_SUCCESS
           MDB_TLS_FULL
           MDB_TXN_FULL
@@ -100,7 +83,27 @@ if (eval {require ExtUtils::Constant; 1}) {
           MDB_VERSION_MISMATCH
           MDB_VERSION_PATCH
           MDB_WRITEMAP
-          )
+          ),
+        {name=>"MDB_VERSION_STRING", type=>"PV", macro=>"1"},
+        {name=>"MDB_VERSION_DATE", type=>"PV", macro=>"1"},
+        {name=>"MDB_FIRST", macro=>"1"},
+        {name=>"MDB_FIRST_DUP", macro=>"1"},
+        {name=>"MDB_GET_BOTH", macro=>"1"},
+        {name=>"MDB_GET_BOTH_RANGE", macro=>"1"},
+        {name=>"MDB_GET_CURRENT", macro=>"1"},
+        {name=>"MDB_GET_MULTIPLE", macro=>"1"},
+        {name=>"MDB_LAST", macro=>"1"},
+        {name=>"MDB_LAST_DUP", macro=>"1"},
+        {name=>"MDB_NEXT", macro=>"1"},
+        {name=>"MDB_NEXT_DUP", macro=>"1"},
+        {name=>"MDB_NEXT_MULTIPLE", macro=>"1"},
+        {name=>"MDB_NEXT_NODUP", macro=>"1"},
+        {name=>"MDB_PREV", macro=>"1"},
+        {name=>"MDB_PREV_DUP", macro=>"1"},
+        {name=>"MDB_PREV_NODUP", macro=>"1"},
+        {name=>"MDB_SET", macro=>"1"},
+        {name=>"MDB_SET_KEY", macro=>"1"},
+        {name=>"MDB_SET_RANGE", macro=>"1"}
     );
     ExtUtils::Constant::WriteConstants(
         NAME         => 'LMDB::Core',
