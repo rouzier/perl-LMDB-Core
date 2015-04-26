@@ -17,15 +17,105 @@ our @ISA = qw(Exporter);
 # This allows declaration	use LMDB::Core ':all';
 # If you do not need this, moving things directly into @EXPORT or @EXPORT_OK
 # will save memory.
-our %EXPORT_TAGS = ( 'all' => [ qw(
-	
-) ] );
+our %EXPORT_TAGS = (
+    'all' => [
+        qw(
+          MDB_APPEND MDB_APPENDDUP
+          MDB_BAD_DBI MDB_BAD_RSLOT
+          MDB_BAD_TXN MDB_BAD_VALSIZE
+          MDB_CORRUPTED MDB_CP_COMPACT
+          MDB_CREATE MDB_CURRENT
+          MDB_CURSOR_FULL MDB_DBS_FULL
+          MDB_DUPFIXED MDB_DUPSORT
+          MDB_FIRST MDB_FIRST_DUP
+          MDB_FIXEDMAP MDB_GET_BOTH
+          MDB_GET_BOTH_RANGE MDB_GET_CURRENT
+          MDB_GET_MULTIPLE MDB_INCOMPATIBLE
+          MDB_INTEGERDUP MDB_INTEGERKEY
+          MDB_INVALID MDB_KEYEXIST
+          MDB_LAST MDB_LAST_DUP
+          MDB_LAST_ERRCODE MDB_MAPASYNC
+          MDB_MAP_FULL MDB_MAP_RESIZED
+          MDB_MAXKEYSIZE MDB_MULTIPLE
+          MDB_NEXT MDB_NEXT_DUP
+          MDB_NEXT_MULTIPLE MDB_NEXT_NODUP
+          MDB_NODUPDATA MDB_NOLOCK
+          MDB_NOMEMINIT MDB_NOMETASYNC
+          MDB_NOOVERWRITE MDB_NORDAHEAD
+          MDB_NOSUBDIR MDB_NOSYNC
+          MDB_NOTFOUND MDB_NOTLS
+          MDB_PAGE_FULL MDB_PAGE_NOTFOUND
+          MDB_PANIC MDB_PREV
+          MDB_PREV_DUP MDB_PREV_NODUP
+          MDB_RDONLY MDB_READERS_FULL
+          MDB_RESERVE MDB_REVERSEDUP
+          MDB_REVERSEKEY MDB_SET
+          MDB_SET_KEY MDB_SET_RANGE
+          MDB_SUCCESS MDB_TLS_FULL
+          MDB_TXN_FULL MDB_VERSION_DATE
+          MDB_VERSION_FULL MDB_VERSION_MAJOR
+          MDB_VERSION_MINOR MDB_VERSION_MISMATCH
+          MDB_VERSION_PATCH MDB_VERSION_STRING
+          MDB_WRITEMAP
+        ),
+        qw(
+          mdb_version mdb_strerror
+          mdb_env_create mdb_env_open
+          mdb_env_copy mdb_env_copyfd
+          mdb_env_stat mdb_env_info
+          mdb_env_sync mdb_env_close
+          mdb_env_set_flags mdb_env_get_flags
+          mdb_env_get_path mdb_env_get_fd
+          mdb_env_set_mapsize mdb_env_set_maxreaders
+          mdb_env_get_maxreaders mdb_env_set_maxdbs
+          mdb_env_get_maxkeysize mdb_env_set_userctx
+          mdb_env_get_userctx mdb_txn_begin
+          mdb_txn_env mdb_txn_id
+          mdb_txn_commit mdb_txn_renew
+          mdb_txn_abort mdb_txn_reset
+          mdb_dbi_open mdb_stat
+          mdb_dbi_flags mdb_dbi_close
+          mdb_drop mdb_set_compare
+          mdb_set_dupsort mdb_get
+          mdb_put mdb_del
+          mdb_cursor_open mdb_cursor_close
+          mdb_cursor_renew mdb_cursor_txn
+          mdb_cursor_dbi mdb_cursor_get
+          mdb_cursor_put mdb_cursor_del
+          mdb_cursor_count mdb_cmp
+          mdb_dcmp mdb_reader_check
+        )
+    ],
+    cursor => [
+        qw(
+          mdb_cursor_open mdb_cursor_close
+          mdb_cursor_renew mdb_cursor_txn
+          mdb_cursor_dbi mdb_cursor_get
+          mdb_cursor_put mdb_cursor_del
+          mdb_cursor_count
+          MDB_FIRST
+          MDB_FIRST_DUP
+          MDB_GET_BOTH
+          MDB_GET_BOTH_RANGE
+          MDB_GET_CURRENT
+          MDB_GET_MULTIPLE
+          MDB_LAST
+          MDB_LAST_DUP
+          MDB_NEXT
+          MDB_NEXT_DUP
+          MDB_NEXT_MULTIPLE
+          MDB_NEXT_NODUP
+          MDB_PREV
+          MDB_PREV_DUP
+          MDB_PREV_NODUP
+          MDB_SET
+          MDB_SET_KEY
+          MDB_SET_RANGE
+        )
+    ],
+);
 
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
-
-our @EXPORT = qw(
-	
-);
 
 our $VERSION = '0.01';
 
