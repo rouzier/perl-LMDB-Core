@@ -32,6 +32,27 @@ typedef struct {
 
 START_MY_CXT
 
+static int LMDB_Core_msg_func(const char *msg, void *ctx) {
+    int count;
+    SV* method = (SV*) ctx;
+    dTHX;
+    dSP;
+    int ret;
+    ENTER; SAVETMPS;
+    PUSHMARK(SP);
+    PUSHs(sv_2mortal(newSVpv(msg,0)));
+    PUTBACK;
+    count = call_sv(method, G_SCALAR);
+    SPAGAIN;
+    if(count != 1) {
+        croak("LMDB_Core_msg_func did not return a single value");
+    }
+    ret = POPi;
+    PUTBACK;
+    FREETMPS; LEAVE;
+    return ret;
+}
+
 static int  LMDB_Core_cmp(const MDB_val *a, const MDB_val *b, void * ctx) {
     SV* method = (SV*) ctx;
     dTHX;
@@ -415,10 +436,6 @@ int  mdb_set_relctx(MDB_txn *txn, MDB_dbi dbi, void *ctx);
 
 =cut
 
-=begin
-
-
-=cut
 int
 mdb_get(txn, dbi, key, data)
     LMDB::Core::Txn txn
@@ -514,12 +531,14 @@ mdb_dcmp(txn, dbi, a, b)
     MDB_valIn   &a
     MDB_valIn   &b
 
-=begin
-
-typedef int (MDB_msg_func)(const char *msg, void *ctx);
-int	mdb_reader_list(MDB_env *env, MDB_msg_func *func, void *ctx);
-
-=cut
+int
+mdb_reader_list(env, func);
+    LMDB::Core::Env env
+    SV * func
+    CODE:
+    RETVAL = mdb_reader_list(env,LMDB_Core_msg_func,func);
+    OUTPUT:
+    RETVAL
 
 int
 mdb_reader_check(env, dead)
