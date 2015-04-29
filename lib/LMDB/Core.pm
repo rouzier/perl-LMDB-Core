@@ -84,6 +84,7 @@ our %EXPORT_TAGS = (
           mdb_cursor_put mdb_cursor_del
           mdb_cursor_count mdb_cmp
           mdb_dcmp mdb_reader_check
+          mdb_reader_list
         )
     ],
     cursor => [
@@ -113,9 +114,43 @@ our %EXPORT_TAGS = (
           MDB_SET_RANGE
         )
     ],
+    simple => [
+        qw(
+          mdb_env_create mdb_env_open
+          mdb_txn_begin mdb_env_close
+          mdb_get mdb_put mdb_del
+          MDB_KEYEXIST MDB_SUCCESS MDB_NOTFOUND MDB_NOTLS MDB_NOLOCK MDB_NOOVERWRITE MDB_NOSUBDIR MDB_NOTFOUND
+        )
+    ],
+    errors => [
+        qw(
+          mdb_strerror
+          MDB_SUCCESS
+          MDB_KEYEXIST
+          MDB_NOTFOUND
+          MDB_PAGE_NOTFOUND
+          MDB_CORRUPTED
+          MDB_PANIC
+          MDB_VERSION_MISMATCH
+          MDB_INVALID
+          MDB_MAP_FULL
+          MDB_DBS_FULL
+          MDB_READERS_FULL
+          MDB_TLS_FULL
+          MDB_TXN_FULL
+          MDB_CURSOR_FULL
+          MDB_PAGE_FULL
+          MDB_MAP_RESIZED
+          MDB_INCOMPATIBLE
+          MDB_BAD_RSLOT
+          MDB_BAD_TXN
+          MDB_BAD_VALSIZE
+          MDB_BAD_DBI
+        )
+    ],
 );
 
-our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
+*EXPORT_OK = $EXPORT_TAGS{'all'};
 
 our $VERSION = '0.01';
 
@@ -189,11 +224,11 @@ If you have a web site set up for your module, mention it here.
 
 =head1 AUTHOR
 
-root, E<lt>root@localdomainE<gt>
+James Jude Rouzier, E<lt>rouzier@gmail.comE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2015 by root
+Copyright (C) 2015 by James Jude Rouzier
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.10.1 or,
