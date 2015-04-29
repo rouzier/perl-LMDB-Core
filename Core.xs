@@ -54,6 +54,7 @@ static int LMDB_Core_msg_func(const char *msg, void *ctx) {
 }
 
 static int  LMDB_Core_cmp(const MDB_val *a, const MDB_val *b, void * ctx) {
+    int count;
     SV* method = (SV*) ctx;
     dTHX;
     dSP;
@@ -62,8 +63,11 @@ static int  LMDB_Core_cmp(const MDB_val *a, const MDB_val *b, void * ctx) {
     PUSHMARK(SP);
     sv_setpvn_mg(get_sv("::a",GV_ADDMULTI), a->mv_data, a->mv_size);
     sv_setpvn_mg(get_sv("::b",GV_ADDMULTI), b->mv_data, b->mv_size);
-    call_sv(method, G_SCALAR|G_NOARGS);
+    count = call_sv(method, G_SCALAR|G_NOARGS);
     SPAGAIN;
+    if(count != 1) {
+        croak("LMDB_Core_cmp did not return a single value");
+    }
     ret = POPi;
     PUTBACK;
     FREETMPS; LEAVE;
@@ -412,9 +416,24 @@ mdb_set_compare(txn, dbi, cmp)
                unsigned int dbi
                SV *cmp 
     CODE:
+    void * old_val;
+    int rc;
+    if((rc = mdb_get_cmpctx(txn, dbi, &old_val)) != MDB_SUCCESS) {
+        goto done;
+    }
+    if(old_val) {
+        SvREFCNT_dec(old_val);
+    }
+    if((rc = mdb_set_cmpctx(txn, dbi, (void *)cmp)) != MDB_SUCCESS) {
+        goto done;
+    }
+    if((rc = mdb_set_compare(txn, dbi, LMDB_Core_cmp)) != MDB_SUCCESS) {
+        mdb_set_cmpctx(txn, dbi, NULL);
+        goto done;
+    }
     SvREFCNT_inc(cmp);
-    mdb_set_cmpctx(txn, dbi, (void *)cmp);
-    RETVAL = mdb_set_compare(txn, dbi, LMDB_Core_cmp);
+done:
+    RETVAL = rc;
     OUTPUT:
     RETVAL
 
@@ -424,8 +443,24 @@ mdb_set_dupsort(txn, dbi, cmp)
                unsigned int dbi
                SV *cmp 
     CODE:
-    mdb_set_dcmpctx(txn, dbi, (void *)cmp);
-    RETVAL = mdb_set_dupsort(txn, dbi, LMDB_Core_cmp);
+    void * old_val;
+    int rc;
+    if((rc = mdb_get_dcmpctx(txn, dbi, &old_val)) != MDB_SUCCESS) {
+        goto done;
+    }
+    if(old_val) {
+        SvREFCNT_dec(old_val);
+    }
+    if((rc = mdb_set_dcmpctx(txn, dbi, (void *)cmp)) != MDB_SUCCESS) {
+        goto done;
+    }
+    if((rc = mdb_set_dupsort(txn, dbi, LMDB_Core_cmp)) != MDB_SUCCESS) {
+        mdb_set_dcmpctx(txn, dbi, NULL);
+        goto done;
+    }
+    SvREFCNT_inc(cmp);
+done:
+    RETVAL = rc;
     OUTPUT:
     RETVAL
 
