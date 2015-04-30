@@ -15,7 +15,7 @@ WriteMakefile(
         : ()
     ),
     LIBS   => [''],      # e.g., '-lm'
-    DEFINE => '',        # e.g., '-DHAVE_SOMETHING'
+    DEFINE => '-DMDB_CMP_CTX=1',        # e.g., '-DHAVE_SOMETHING'
     MYEXTLIB => 'liblmdb/liblmdb$(LIB_EXT)',
     INC    => '-I. ',    # e.g., '-I. -I/usr/include/other'
                          # Un-comment this if you add C files to link with later:
@@ -130,7 +130,7 @@ sub MY::postamble {
 $(MYEXTLIB): liblmdb/mdb.c liblmdb/lmdb.h
 @[
 	cd liblmdb
-	$(MAKE) XCFLAGS=-fPIC liblmdb$(LIB_EXT)
+	$(MAKE) XCFLAGS="-fPIC -DMDB_CMP_CTX=1" liblmdb$(LIB_EXT)
 	cd ..
 ]
 EOT
@@ -139,7 +139,7 @@ EOT
             return <<'EOT';
 $(MYEXTLIB): liblmdb/mdb.c liblmdb/lmdb.h
 	cd liblmdb
-	$(MAKE) XCFLAGS=-fPIC liblmdb$(LIB_EXT)
+	$(MAKE) XCFLAGS="-fPIC -DMDB_CMP_CTX=1" liblmdb$(LIB_EXT)
 	cd ..
 EOT
         }
@@ -147,7 +147,7 @@ EOT
     else {
         return <<'EOT';
 $(MYEXTLIB): liblmdb/mdb.c liblmdb/lmdb.h
-	cd liblmdb && $(MAKE) XCFLAGS=-fPIC liblmdb$(LIB_EXT)
+	cd liblmdb && $(MAKE) XCFLAGS="-fPIC -DMDB_CMP_CTX=1" liblmdb$(LIB_EXT)
 EOT
     }
 }
