@@ -174,6 +174,7 @@ void DESTROY(stat)
 
 
 MODULE = LMDB::Core		PACKAGE = LMDB::Core		
+PROTOTYPES: DISABLE
 
 INCLUDE: const-xs.inc
 
@@ -475,10 +476,9 @@ int
 mdb_get(txn, dbi, key, data)
     LMDB::Core::Txn txn
     unsigned int dbi
-    MDB_valInOut &key
+    MDB_valIn &key
     MDB_valInOut &data
     OUTPUT:
-    key
     data
 
 int
