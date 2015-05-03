@@ -25,10 +25,20 @@ T_PTROBJ_N
                         ${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
                         \"$var\", \"LMDB::Txn\");
 T_mdb_val_in
-	$var.mv_data = SvPV($arg, $var.mv_size);
+    if($arg != &PL_sv_undef) {
+        $var.mv_data = SvPV($arg, $var.mv_size);
+    } else {
+        $var.mv_data = NULL;
+        $var.mv_size = 0;
+    }
 
 T_mdb_val_in_out
-	$var.mv_data = SvPV($arg, $var.mv_size);
+    if($arg != &PL_sv_undef) {
+        $var.mv_data = SvPV($arg, $var.mv_size);
+    } else {
+        $var.mv_data = NULL;
+        $var.mv_size = 0;
+    }
 
 ####################################################################################
 OUTPUT
