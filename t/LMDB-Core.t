@@ -6,7 +6,7 @@
 # change 'tests => 1' to 'tests => last_test_to_print';
 use constant BULK_INSERT => 10;
 
-use Test::More tests => (19 + BULK_INSERT * 6);
+use Test::More tests => (20 + BULK_INSERT * 6);
 use Test::NoWarnings;
 use File::Temp qw(tempdir);
 BEGIN {use_ok('LMDB::Core')}
@@ -68,7 +68,11 @@ $rc = mdb_txn_commit($txn);
 
 is($rc, 0, "mdb_txn_commit");
 
+
 $rc = mdb_txn_begin($env, undef, MDB_RDONLY(), $txn);
+
+is($rc, 0, "mdb_txn_begin MDB_RDONLY");
+$rc = mdb_get($txn, $dbi, "key_1", undef);
 
 for (my $i = 0; $i < BULK_INSERT; $i++) {
     my $key  = "key_$i";
