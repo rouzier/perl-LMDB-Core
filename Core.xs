@@ -417,22 +417,28 @@ mdb_set_compare(txn, dbi, cmp)
                unsigned int dbi
                SV *cmp 
     CODE:
-    void * old_val;
+    SV *callback;
     int rc;
-    if((rc = mdb_get_cmpctx(txn, dbi, &old_val)) != MDB_SUCCESS) {
+    if(!SvOK(cmp)) {
+        rc = EINVAL;
         goto done;
     }
-    if(old_val) {
-        SvREFCNT_dec(old_val);
+    if((rc = mdb_get_cmpctx(txn, dbi,(void**) &callback)) != MDB_SUCCESS) {
+        goto done;
     }
-    if((rc = mdb_set_cmpctx(txn, dbi, (void *)cmp)) != MDB_SUCCESS) {
+    if (callback == (SV*)NULL)  {
+        callback = newSVsv(cmp);
+    }
+    else {
+        SvSetSV(callback, cmp);
+    }
+    if((rc = mdb_set_cmpctx(txn, dbi, (void *)callback)) != MDB_SUCCESS) {
         goto done;
     }
     if((rc = mdb_set_compare(txn, dbi, LMDB_Core_cmp)) != MDB_SUCCESS) {
         mdb_set_cmpctx(txn, dbi, NULL);
         goto done;
     }
-    SvREFCNT_inc(cmp);
 done:
     RETVAL = rc;
     OUTPUT:
@@ -444,15 +450,22 @@ mdb_set_dupsort(txn, dbi, cmp)
                unsigned int dbi
                SV *cmp 
     CODE:
-    void * old_val;
+    SV *callback;
     int rc;
-    if((rc = mdb_get_dcmpctx(txn, dbi, &old_val)) != MDB_SUCCESS) {
+    if(!SvOK(cmp)) {
+        rc = EINVAL;
         goto done;
     }
-    if(old_val) {
-        SvREFCNT_dec(old_val);
+    if((rc = mdb_get_dcmpctx(txn, dbi,(void**) &callback)) != MDB_SUCCESS) {
+        goto done;
     }
-    if((rc = mdb_set_dcmpctx(txn, dbi, (void *)cmp)) != MDB_SUCCESS) {
+    if (callback == (SV*)NULL)  {
+        callback = newSVsv(cmp);
+    }
+    else {
+        SvSetSV(callback, cmp);
+    }
+    if((rc = mdb_set_dcmpctx(txn, dbi, (void *)callback)) != MDB_SUCCESS) {
         goto done;
     }
     if((rc = mdb_set_dupsort(txn, dbi, LMDB_Core_cmp)) != MDB_SUCCESS) {
