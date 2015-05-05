@@ -91,8 +91,8 @@ is($rc, EACCES, "mdb_put failed readonly");
 $rc = mdb_cursor_open($txn, $dbi, my $cursor);
 is($rc, 0, "mdb_cursor_open");
 
-my $key  = '';
-my $data = '';
+my $key;
+my $data;
 $rc = mdb_cursor_get($cursor, $key, $data, MDB_FIRST());
 
 #Testing insert order in reverse
