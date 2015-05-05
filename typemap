@@ -43,7 +43,7 @@ T_mdb_val_in_out
 ####################################################################################
 OUTPUT
 T_mdb_val_in_out
-    if($arg != &PL_sv_undef) {
+    if(RETVAL == MDB_SUCCESS && $arg != &PL_sv_undef) {
         SvPVX($arg) = $var.mv_data;
         SvLEN($arg) = 0;
         SvCUR($arg) = $var.mv_size;
