@@ -490,7 +490,7 @@ mdb_get(txn, dbi, key, data)
     LMDB::Core::Txn txn
     unsigned int dbi
     MDB_valIn &key
-    MDB_valInOut &data
+    MDB_valInOut &data = NO_INIT
     OUTPUT:
     data
 
