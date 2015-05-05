@@ -114,12 +114,15 @@ our %EXPORT_TAGS = (
           MDB_SET_RANGE
         )
     ],
-    simple => [
+    quick => [
         qw(
           mdb_env_create mdb_env_open
           mdb_txn_begin mdb_env_close
+          mdb_dbi_open
           mdb_get mdb_put mdb_del
-          MDB_KEYEXIST MDB_SUCCESS MDB_NOTFOUND MDB_NOTLS MDB_NOLOCK MDB_NOOVERWRITE MDB_NOSUBDIR MDB_NOTFOUND
+          mdb_txn_commit mdb_txn_abort
+          MDB_KEYEXIST MDB_SUCCESS MDB_NOTFOUND MDB_NOTLS MDB_NOLOCK MDB_NOOVERWRITE MDB_NOSUBDIR MDB_NOTFOUND MDB_CREATE
+          MDB_RDONLY
         )
     ],
     errors => [
