@@ -33,23 +33,26 @@ T_mdb_val_in
     }
 
 T_mdb_val_in_out
-    if(SvPOK($arg)) {
-        $var.mv_data = SvPV($arg, $var.mv_size);
+    MDB_val dummy_$var;
+    if($arg == &PL_sv_undef) {
+        $var = NULL;
     } else {
-        $var.mv_data = NULL;
-        $var.mv_size = 0;
+        if(SvPOK($arg)) {
+            dummy_$var.mv_data = SvPV($arg, dummy_$var.mv_size);
+        }
+        $var = &dummy_$var;
     }
 
 ####################################################################################
 OUTPUT
 T_mdb_val_in_out
-    if(RETVAL == MDB_SUCCESS && $arg != &PL_sv_undef) {
+    if($var && RETVAL == MDB_SUCCESS && $arg != &PL_sv_undef) {
         if(!SvPOK($arg)) {
             sv_setsv($arg,newSVpv("",0));
         }
-        SvPVX($arg) = $var.mv_data;
+        SvPVX($arg) = dummy_$var.mv_data;
         SvLEN($arg) = 0;
-        SvCUR($arg) = $var.mv_size;
+        SvCUR($arg) = dummy_$var.mv_size;
         SvUTF8_off($arg);
         SvREADONLY_on($arg);
         SvTAINTED_on($arg);

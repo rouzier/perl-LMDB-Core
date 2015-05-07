@@ -22,7 +22,7 @@ typedef MDB_txn*     TxnOrNull;
 typedef MDB_cursor* LMDB__Core__Cursor;
 typedef MDB_stat*   LMDB__Core__Stat;
 typedef MDB_val     MDB_valIn;
-typedef MDB_val     MDB_valInOut;
+typedef MDB_val*    MDB_valInOut;
 
 static int LMDB_Core_msg_func(const char *msg, void *ctx) {
     int count;
@@ -482,7 +482,7 @@ mdb_get(txn, dbi, key, data)
     LMDB::Core::Txn txn
     unsigned int dbi
     MDB_valIn &key
-    MDB_valInOut &data = NO_INIT
+    MDB_valInOut data;
     OUTPUT:
     data
 
@@ -531,8 +531,8 @@ mdb_cursor_dbi(cursor)
 int
 mdb_cursor_get(cursor, key, data, MDB_cursor_op op)
     LMDB::Core::Cursor cursor
-    MDB_valInOut &key
-    MDB_valInOut &data
+    MDB_valInOut key
+    MDB_valInOut data
     OUTPUT:
     key
     data
