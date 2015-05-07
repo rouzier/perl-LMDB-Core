@@ -6,7 +6,7 @@
 # change 'tests => 1' to 'tests => last_test_to_print';
 use constant BULK_INSERT => 10;
 
-use Test::More tests => (20 + BULK_INSERT * 6);
+use Test::More tests => (21 + BULK_INSERT * 6);
 use Test::NoWarnings;
 use File::Temp qw(tempdir);
 BEGIN {use_ok('LMDB::Core')}
@@ -95,14 +95,16 @@ my $key;
 my $data;
 $rc = mdb_cursor_get($cursor, $key, $data, MDB_FIRST());
 
+is($rc, 0, "mdb_cursor_get FIRST");
+
 #Testing insert order in reverse
 
 for (my $i = BULK_INSERT - 1; $i >= 0; $i--) {
     is($rc, 0, "mdb_cursor_get");
     my $test_key = "key_$i";
     my $test_val = "val_$i";
-    is($test_key, $key,  "Insert order key");
-    is($test_val, $data, "Insert order val");
+    is($key,$test_key,  "Insert order key");
+    is($data,$test_val, "Insert order val");
     $rc = mdb_cursor_get($cursor, $key, $data, MDB_NEXT());
 }
 
