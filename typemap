@@ -51,7 +51,7 @@ T_mdb_val_in_out
             SvPV_free($arg);
         }
         else {
-            sv_setsv($arg,newSVpv("",0));
+            sv_setpvn($arg,"",0);
         }
         SvPVX($arg) = dummy_$var.mv_data;
         SvLEN($arg) = 0;
