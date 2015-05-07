@@ -201,32 +201,58 @@ XSLoader::load('LMDB::Core', $VERSION);
 
 1;
 __END__
-# Below is stub documentation for your module. You'd better edit it!
 
 =head1 NAME
 
-LMDB::Core - Perl extension for blah blah blah
+LMDB::Core - A thin wrapper for the LMDB api
 
 =head1 SYNOPSIS
 
-  use LMDB::Core;
-  blah blah blah
+  use LMDB::Core qw(:quick);
+
+  my $dbdir = 'dbdir';
+
+  mkdir $dbdir unless -d $dbdir;
+
+  #Create the LMDB environment
+  my $rc = mdb_env_create(my $env);
+
+  #Open the environment
+  $rc = mdb_env_open($env, $dbdir);
+
+  #New write transaction
+  $rc = mdb_txn_begin($env, undef, 0, my $txn);
+
+  #Open the default database
+  $rc = mdb_dbi_open($txn, undef, MDB_CREATE, my $dbi);
+
+  #Add to the database
+  $rc = mdb_put($txn,$dbi,"larry","wall");
+
+  #Commit your transaction which closes your txn
+  $rc = mdb_txn_commit($txn);
+
+  #New read transaction
+  $rc = mdb_txn_begin($env, undef, MDB_RDONLY, $txn);
+
+  #Get the value from the database
+  $rc = mdb_get($txn,$dbi,"larry",my $data);
+
+  print "larry = $data\n"
+
+  #Close the transaction
+  mdb_txn_abort($txn);
+
+  #Close the environment
+  mdb_env_close($env);
 
 =head1 DESCRIPTION
 
-Stub documentation for LMDB::Core, created by h2xs. It looks like the
-author of the extension was negligent enough to leave the stub
-unedited.
-
-Blah blah blah.
-
 =head2 EXPORT
 
-None by default.
-
-
-
 =head1 SEE ALSO
+
+L<LMDB_File> another perl module for LMDB
 
 Mention other useful documentation such as the documentation of
 related modules or operating system documentation (such as man pages
