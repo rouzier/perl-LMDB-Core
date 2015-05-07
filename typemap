@@ -47,7 +47,10 @@ T_mdb_val_in_out
 OUTPUT
 T_mdb_val_in_out
     if($var && RETVAL == MDB_SUCCESS && $arg != &PL_sv_undef) {
-        if(!SvPOK($arg)) {
+        if(SvPOK($arg)) {
+            SvPV_free($arg);
+        }
+        else {
             sv_setsv($arg,newSVpv("",0));
         }
         SvPVX($arg) = dummy_$var.mv_data;
