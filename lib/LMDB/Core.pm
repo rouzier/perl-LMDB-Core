@@ -153,6 +153,18 @@ our %EXPORT_TAGS = (
     ],
 );
 
+sub import {
+    my $pkg = caller;
+
+    #  Touch the caller's $a and $b, to avoid the warning of
+    #   Name "main::a" used only once: possible typo" warning
+    no strict 'refs';
+    ${"${pkg}::a"} = ${"${pkg}::a"};
+    ${"${pkg}::b"} = ${"${pkg}::b"};
+
+    goto &Exporter::import;
+}
+
 *EXPORT_OK = $EXPORT_TAGS{'all'};
 
 our $VERSION = '0.01';
