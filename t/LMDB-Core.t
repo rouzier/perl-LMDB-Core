@@ -6,7 +6,7 @@
 # change 'tests => 1' to 'tests => last_test_to_print';
 use constant BULK_INSERT => 10;
 
-use Test::More tests => (21 + BULK_INSERT * 6);
+use Test::More tests => (23 + BULK_INSERT * 6);
 use Test::NoWarnings;
 use File::Temp qw(tempdir);
 BEGIN {use_ok('LMDB::Core')}
@@ -53,9 +53,12 @@ is($rc, 0, "mdb_txn_begin");
 isa_ok($txn, "LMDB::Core::Txn", "Isa LMDB::Core::Txn");
 
 $rc = mdb_dbi_open($txn, undef, 0, my $dbi);
-mdb_set_compare($txn, $dbi, sub {$b cmp $a});
 
 is($rc, 0, "mdb_dbi_open");
+
+$rc = mdb_set_compare($txn, $dbi, sub {$b cmp $a});
+
+is($rc, 0, "mdb_set_compare");
 
 for (my $i = 0; $i < BULK_INSERT; $i++) {
     my $key = "key_$i";
@@ -118,6 +121,9 @@ mdb_reader_list($env,sub { $count++ ; return -1 });
 is($count,1,"The reader list callback is working");
 
 mdb_cursor_close($cursor);
+
+$rc = mdb_clear_compare($txn, $dbi);
+is($rc, 0, "mdb_clear_compare");
 
 mdb_txn_abort($txn);
 
