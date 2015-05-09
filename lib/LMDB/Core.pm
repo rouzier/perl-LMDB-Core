@@ -7,6 +7,7 @@ use Carp;
 
 require Exporter;
 use AutoLoader;
+use version;
 
 our @ISA = qw(Exporter);
 
@@ -168,7 +169,7 @@ sub import {
 
 *EXPORT_OK = $EXPORT_TAGS{'all'};
 
-our $VERSION = '0.01';
+our $VERSION = v0.9.14.0;
 
 sub AUTOLOAD {
     # This AUTOLOAD is used to 'autoload' constants from the constant()
