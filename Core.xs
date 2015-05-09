@@ -405,9 +405,9 @@ mdb_drop(txn, dbi, del = 0)
 
 int
 mdb_set_compare(txn, dbi, cmp) 
-               LMDB::Core::Txn txn
-               unsigned int dbi
-               SV *cmp 
+    LMDB::Core::Txn txn
+    unsigned int dbi
+    SV *cmp 
     CODE:
     SV *callback;
     int rc;
@@ -437,10 +437,35 @@ done:
     RETVAL
 
 int
+mdb_clear_compare(txn, dbi) 
+    LMDB::Core::Txn txn
+    unsigned int dbi
+    CODE:
+    SV *callback;
+    int rc;
+    if((rc = mdb_get_cmpctx(txn, dbi,(void**) &callback)) != MDB_SUCCESS) {
+        goto done;
+    }
+    if (callback == (SV*)NULL)  {
+        goto done;
+    }
+    SvREFCNT_dec(callback);
+    if((rc = mdb_set_cmpctx(txn, dbi, NULL)) != MDB_SUCCESS) {
+        goto done;
+    }
+    if((rc = mdb_set_compare(txn, dbi, NULL)) != MDB_SUCCESS) {
+        goto done;
+    }
+done:
+    RETVAL = rc;
+    OUTPUT:
+    RETVAL
+
+int
 mdb_set_dupsort(txn, dbi, cmp) 
-               LMDB::Core::Txn txn
-               unsigned int dbi
-               SV *cmp 
+    LMDB::Core::Txn txn
+    unsigned int dbi
+    SV *cmp 
     CODE:
     SV *callback;
     int rc;
@@ -465,6 +490,31 @@ mdb_set_dupsort(txn, dbi, cmp)
         goto done;
     }
     SvREFCNT_inc(cmp);
+done:
+    RETVAL = rc;
+    OUTPUT:
+    RETVAL
+
+int
+mdb_clear_dupsort(txn, dbi) 
+    LMDB::Core::Txn txn
+    unsigned int dbi
+    CODE:
+    SV *callback;
+    int rc;
+    if((rc = mdb_get_dcmpctx(txn, dbi,(void**) &callback)) != MDB_SUCCESS) {
+        goto done;
+    }
+    if (callback == (SV*)NULL)  {
+        goto done;
+    }
+    SvREFCNT_dec(callback);
+    if((rc = mdb_set_dcmpctx(txn, dbi, NULL)) != MDB_SUCCESS) {
+        goto done;
+    }
+    if((rc = mdb_set_dupsort(txn, dbi, NULL)) != MDB_SUCCESS) {
+        goto done;
+    }
 done:
     RETVAL = rc;
     OUTPUT:

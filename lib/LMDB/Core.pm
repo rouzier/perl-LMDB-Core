@@ -84,6 +84,7 @@ our %EXPORT_TAGS = (
           mdb_cursor_put mdb_cursor_del
           mdb_cursor_count mdb_cmp
           mdb_dcmp mdb_reader_check
+          mdb_clear_compare mdb_clear_dupsort
           mdb_reader_list
         )
     ],
