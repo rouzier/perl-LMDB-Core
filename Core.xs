@@ -18,7 +18,7 @@
 typedef	MDB_env*    LMDB__Core__Env;
 typedef	MDB_envinfo*    LMDB__Core__EnvInfo;
 typedef	MDB_txn*    LMDB__Core__Txn;
-typedef MDB_txn*     TxnOrNull;
+typedef MDB_txn*    LMDB__Core__TxnNullable;
 typedef MDB_cursor* LMDB__Core__Cursor;
 typedef MDB_stat*   LMDB__Core__Stat;
 typedef MDB_val     MDB_valIn;
@@ -187,12 +187,12 @@ mdb_strerror(err)
 
 int
 mdb_env_create(env)
-	LMDB::Core::Env   &env = NO_INIT
+	LMDB::Core::Env   &env = NULL;
     OUTPUT:
 	env
 
 int
-mdb_env_open(env, path, flags= 0 , mode = 0660)
+mdb_env_open(env, path, flags = 0, mode = 0660)
 	LMDB::Core::Env   env
 	const char *	path
 	unsigned flags
@@ -219,7 +219,8 @@ mdb_env_copyfd(env, fd, flags = 0)
 	RETVAL
 
 
-int  mdb_env_stat(env, stat)
+int
+mdb_env_stat(env, stat)
     LMDB::Core::Env env
     LMDB::Core::Stat stat = NO_INIT
     INIT:
@@ -230,7 +231,8 @@ int  mdb_env_stat(env, stat)
     stat
     RETVAL
 
-int  mdb_env_info(env,envinfo)
+int
+mdb_env_info(env,envinfo)
     LMDB::Core::Env env
     LMDB::Core::EnvInfo envinfo = NO_INIT
     INIT:
@@ -270,7 +272,8 @@ mdb_env_get_path(env, path)
     OUTPUT:
 	path
 
-int  mdb_env_get_fd(env, fd)
+int
+mdb_env_get_fd(env, fd)
     LMDB::Core::Env   env
     int &fd = NO_INIT
     OUTPUT:
@@ -330,9 +333,9 @@ int  mdb_env_set_assert(MDB_env *env, MDB_assert_func *func);
 int
 mdb_txn_begin(env, parent, flags, txn)
 	LMDB::Core::Env   env
-	TxnOrNull   parent
+	LMDB::Core::TxnNullable parent
 	unsigned    flags
-	LMDB::Core::Txn   &txn = NO_INIT
+	LMDB::Core::Txn   &txn = NULL;
     OUTPUT:
 	txn
 
@@ -551,12 +554,11 @@ mdb_del(txn, dbi, key, data)
     MDB_valIn &key
     MDB_valIn &data
 
-
 int
 mdb_cursor_open(txn, dbi, cursor)
 	LMDB::Core::Txn   txn
 	unsigned int	dbi
-	LMDB::Core::Cursor	&cursor = NO_INIT
+	LMDB::Core::Cursor	&cursor = NULL;
     OUTPUT:
 	cursor
 
