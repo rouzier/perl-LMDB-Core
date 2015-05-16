@@ -70,93 +70,93 @@ MODULE = LMDB::Core		PACKAGE = LMDB::Core::EnvInfo
 
 void* mapaddr(envinfo)
     LMDB::Core::EnvInfo envinfo
-    CODE:
+CODE:
     RETVAL = envinfo->me_mapaddr;
-    OUTPUT:
+OUTPUT:
     RETVAL
 
 size_t mapsize(envinfo)
 	LMDB::Core::EnvInfo envinfo
-	CODE:
+CODE:
 	RETVAL = envinfo->me_mapsize;
-	OUTPUT:
+OUTPUT:
 	RETVAL
 
 size_t last_pgno(envinfo)
 	LMDB::Core::EnvInfo envinfo
-	CODE:
+CODE:
 	RETVAL = envinfo->me_last_pgno;
-	OUTPUT:
+OUTPUT:
 	RETVAL
 
 size_t last_txnid(envinfo)
 	LMDB::Core::EnvInfo envinfo
-	CODE:
+CODE:
 	RETVAL = envinfo->me_last_txnid;
-	OUTPUT:
+OUTPUT:
 	RETVAL
 
 unsigned int maxreaders(envinfo)
 	LMDB::Core::EnvInfo envinfo
-	CODE:
+CODE:
 	RETVAL = envinfo->me_maxreaders;
-	OUTPUT:
+OUTPUT:
 	RETVAL
 
 unsigned int numreaders(envinfo)
 	LMDB::Core::EnvInfo envinfo
-	CODE:
+CODE:
 	RETVAL = envinfo->me_numreaders;
-	OUTPUT:
+OUTPUT:
 	RETVAL
 
 void DESTROY(envinfo)
 	LMDB::Core::EnvInfo envinfo
-    CODE:
+CODE:
     Safefree(envinfo);
 
 MODULE = LMDB::Core		PACKAGE = LMDB::Core::Stat
 
 unsigned int psize(stat)
     LMDB::Core::Stat stat
-    CODE:
+CODE:
     RETVAL = stat->ms_psize;
-    OUTPUT:
+OUTPUT:
     RETVAL
 
 unsigned int depth(stat)
     LMDB::Core::Stat stat
-    CODE:
+CODE:
     RETVAL = stat->ms_branch_pages;
-    OUTPUT:
+OUTPUT:
     RETVAL
 
 size_t branch_pages(stat)
     LMDB::Core::Stat stat
-    CODE:
+CODE:
     RETVAL = stat->ms_branch_pages;
-    OUTPUT:
+OUTPUT:
     RETVAL
 
 size_t leaf_pages(stat)
     LMDB::Core::Stat stat
-    CODE:
+CODE:
     RETVAL = stat->ms_leaf_pages;
-    OUTPUT:
+OUTPUT:
     RETVAL
 
 size_t overflow_pages(stat)
     LMDB::Core::Stat stat
-    CODE:
+CODE:
     RETVAL = stat->ms_overflow_pages;
-    OUTPUT:
+OUTPUT:
     RETVAL
 
 size_t entries(stat)
     LMDB::Core::Stat stat
-    CODE:
+CODE:
     RETVAL = stat->ms_entries;
-    OUTPUT:
+OUTPUT:
     RETVAL
 
 void DESTROY(stat)
@@ -176,7 +176,7 @@ mdb_version(major, minor, patch)
     int &major = NO_INIT
     int &minor = NO_INIT
     int &patch = NO_INIT
-    OUTPUT:
+OUTPUT:
     major
     minor
     patch
@@ -188,7 +188,7 @@ mdb_strerror(err)
 int
 mdb_env_create(env)
 	LMDB::Core::Env   &env = NULL;
-    OUTPUT:
+OUTPUT:
 	env
 
 int
@@ -203,9 +203,9 @@ mdb_env_copy(env, path, flags = 0)
 	LMDB::Core::Env   env
 	const char *	path
 	unsigned int flags
-    CODE:
+CODE:
 	RETVAL = mdb_env_copy2(env, path, flags);
-    OUTPUT:
+OUTPUT:
 	RETVAL
 
 int
@@ -213,9 +213,9 @@ mdb_env_copyfd(env, fd, flags = 0)
 	LMDB::Core::Env   env
 	int  fd
 	unsigned flags
-    CODE:
+CODE:
 	RETVAL = mdb_env_copyfd2(env, fd, flags);
-    OUTPUT:
+OUTPUT:
 	RETVAL
 
 
@@ -223,11 +223,11 @@ int
 mdb_env_stat(env, stat)
     LMDB::Core::Env env
     LMDB::Core::Stat stat = NO_INIT
-    INIT:
+INIT:
     Newx(stat, 1, MDB_stat);
-    CODE:
+CODE:
     RETVAL = mdb_env_stat(env,stat);
-    OUTPUT:
+OUTPUT:
     stat
     RETVAL
 
@@ -235,11 +235,11 @@ int
 mdb_env_info(env,envinfo)
     LMDB::Core::Env env
     LMDB::Core::EnvInfo envinfo = NO_INIT
-    INIT:
+INIT:
     Newx(envinfo, 1, MDB_envinfo);
-    CODE:
+CODE:
     RETVAL = mdb_env_info(env,envinfo);
-    OUTPUT:
+OUTPUT:
     envinfo
     RETVAL
 
@@ -309,18 +309,28 @@ int
 mdb_env_set_userctx(env, ctx)
     LMDB::Core::Env   env
     SV* ctx
-    CODE:
-    RETVAL = mdb_env_set_userctx(env,(void*)ctx);
-    OUTPUT:
+CODE:
+    SV* tmp = (SV*) mdb_env_get_userctx(env);
+    if(SvOK(ctx)) {
+        if(tmp == NULL) {
+            tmp = newSVsv(tmp);
+        }
+        else {
+            SvSetSV(tmp, ctx);
+        }
+    } else if(tmp) {
+        SvREFCNT_dec(tmp);
+    }
+    RETVAL = mdb_env_set_userctx(env,(void*)tmp);
+OUTPUT:
     RETVAL
 
 SV *
 mdb_env_get_userctx(env);
     LMDB::Core::Env   env
-    CODE:
-    RETVAL = (SV*) mdb_env_get_userctx(env);
-    OUTPUT:
-    RETVAL
+POSTCALL:
+    if (RETVAL == NULL)
+        XSRETURN_UNDEF;
 
 =begin
 
@@ -336,13 +346,13 @@ mdb_txn_begin(env, parent, flags, txn)
 	LMDB::Core::TxnNullable parent
 	unsigned    flags
 	LMDB::Core::Txn   &txn = NULL;
-    OUTPUT:
+OUTPUT:
 	txn
 
 LMDB::Core::Env
 mdb_txn_env(txn)
 	LMDB::Core::Txn   txn
-    POSTCALL:
+POSTCALL:
     if (RETVAL == NULL)
         XSRETURN_UNDEF;
 
@@ -371,7 +381,7 @@ mdb_dbi_open(txn, name, flags, dbi)
 	const char * name = SvOK($arg) ? (const char *)SvPV_nolen($arg) : NULL;
 	unsigned	flags
 	unsigned int &dbi = NO_INIT
-    OUTPUT:
+OUTPUT:
 	dbi
 
 int
@@ -379,11 +389,11 @@ mdb_stat(txn, dbi, stat);
 	LMDB::Core::Txn   txn
     int dbi
     LMDB::Core::Stat stat = NO_INIT
-    INIT:
+INIT:
     Newx(stat, 1, MDB_stat);
-    CODE:
+CODE:
     RETVAL = mdb_stat(txn,dbi,stat);
-    OUTPUT:
+OUTPUT:
     stat
     RETVAL
 
@@ -392,7 +402,7 @@ mdb_dbi_flags(txn, dbi, flags);
 	LMDB::Core::Txn   txn
     int dbi
     unsigned int &flags = NO_INIT
-    OUTPUT:
+OUTPUT:
     flags
 
 void
@@ -411,7 +421,7 @@ mdb_set_compare(txn, dbi, cmp)
     LMDB::Core::Txn txn
     unsigned int dbi
     SV *cmp 
-    CODE:
+CODE:
     SV *callback;
     int rc;
     if(!SvOK(cmp)) {
@@ -436,14 +446,14 @@ mdb_set_compare(txn, dbi, cmp)
     }
 done:
     RETVAL = rc;
-    OUTPUT:
+OUTPUT:
     RETVAL
 
 int
 mdb_clear_compare(txn, dbi) 
     LMDB::Core::Txn txn
     unsigned int dbi
-    CODE:
+CODE:
     SV *callback;
     int rc;
     if((rc = mdb_get_cmpctx(txn, dbi,(void**) &callback)) != MDB_SUCCESS) {
@@ -461,7 +471,7 @@ mdb_clear_compare(txn, dbi)
     }
 done:
     RETVAL = rc;
-    OUTPUT:
+OUTPUT:
     RETVAL
 
 int
@@ -469,7 +479,7 @@ mdb_set_dupsort(txn, dbi, cmp)
     LMDB::Core::Txn txn
     unsigned int dbi
     SV *cmp 
-    CODE:
+CODE:
     SV *callback;
     int rc;
     if(!SvOK(cmp)) {
@@ -495,14 +505,14 @@ mdb_set_dupsort(txn, dbi, cmp)
     SvREFCNT_inc(cmp);
 done:
     RETVAL = rc;
-    OUTPUT:
+OUTPUT:
     RETVAL
 
 int
 mdb_clear_dupsort(txn, dbi) 
     LMDB::Core::Txn txn
     unsigned int dbi
-    CODE:
+CODE:
     SV *callback;
     int rc;
     if((rc = mdb_get_dcmpctx(txn, dbi,(void**) &callback)) != MDB_SUCCESS) {
@@ -520,7 +530,7 @@ mdb_clear_dupsort(txn, dbi)
     }
 done:
     RETVAL = rc;
-    OUTPUT:
+OUTPUT:
     RETVAL
 
 =begin
@@ -536,7 +546,7 @@ mdb_get(txn, dbi, key, data)
     unsigned int dbi
     MDB_valIn &key
     MDB_valInOut data;
-    OUTPUT:
+OUTPUT:
     data
 
 int
@@ -559,7 +569,7 @@ mdb_cursor_open(txn, dbi, cursor)
 	LMDB::Core::Txn   txn
 	unsigned int	dbi
 	LMDB::Core::Cursor	&cursor = NULL;
-    OUTPUT:
+OUTPUT:
 	cursor
 
 void
@@ -585,7 +595,7 @@ mdb_cursor_get(cursor, key, data, MDB_cursor_op op)
     LMDB::Core::Cursor cursor
     MDB_valInOut key
     MDB_valInOut data
-    OUTPUT:
+OUTPUT:
     key
     data
 
@@ -606,7 +616,7 @@ int
 mdb_cursor_count(cursor, count)
 	LMDB::Core::Cursor	cursor
 	size_t  &count = NO_INIT
-    OUTPUT:
+OUTPUT:
 	count
 
 int
@@ -627,9 +637,9 @@ int
 mdb_reader_list(env, func);
     LMDB::Core::Env env
     SV * func
-    CODE:
+CODE:
     RETVAL = mdb_reader_list(env,LMDB_Core_msg_func,func);
-    OUTPUT:
+OUTPUT:
     RETVAL
 
 int
