@@ -4,7 +4,7 @@
 #########################
 
 # change 'tests => 1' to 'tests => last_test_to_print';
-use Test::More tests => 9;
+use Test::More tests => 8;
 use Test::NoWarnings;
 use File::Temp qw(tempdir);
 BEGIN {use_ok('LMDB::Core')}
@@ -26,7 +26,7 @@ is($rc, 0, "mdb_env_create");
 
 BAIL_OUT("Cannot create mdb environment " . mdb_env_create($rc)) if $rc;
 
-isa_ok($env, "LMDB::Core::Env", "Isa LMDB::Core::Env");
+#isa_ok($env, "LMDB::Core::Env", "Isa LMDB::Core::Env");
 
 my $tempdb = tempdir(CLEANUP => 1);
 
@@ -52,4 +52,4 @@ $rc = mdb_txn_begin($env, undef, 0, my $txn);
 
 is($rc, EACCES, "mdb_txn_begin failed");
 
-is(undef,$txn,"Undef on failure");
+is(0,$txn,"0 on failure");
