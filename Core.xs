@@ -310,18 +310,17 @@ mdb_env_set_userctx(env, ctx)
     LMDB::Core::Env   env
     SV* ctx
 CODE:
-    SV* tmp = (SV*) mdb_env_get_userctx(env);
-    if(SvOK(ctx)) {
-        if(tmp == NULL) {
-            tmp = newSVsv(tmp);
-        }
-        else {
-            SvSetSV(tmp, ctx);
-        }
-    } else if(tmp) {
-        SvREFCNT_dec(tmp);
+    SV* new = NULL;
+    SV* old = (SV*) mdb_env_get_userctx(env);
+    if(!SvOK(ctx)) {
+        goto done;
     }
-    RETVAL = mdb_env_set_userctx(env,(void*)tmp);
+    new = newSVsv(ctx);
+done:
+    if(old) {
+        SvREFCNT_dec(old);
+    }
+    RETVAL = mdb_env_set_userctx(env,(void*)new);
 OUTPUT:
     RETVAL
 
@@ -331,6 +330,7 @@ mdb_env_get_userctx(env);
 POSTCALL:
     if (RETVAL == NULL)
         XSRETURN_UNDEF;
+    SvREFCNT_inc(RETVAL);
 
 =begin
 
