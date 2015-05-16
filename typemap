@@ -1,11 +1,11 @@
 TYPEMAP
 
-LMDB::Core::Env T_PTROBJ
-LMDB::Core::EnvInfo T_PTROBJ
-LMDB::Core::Txn T_PTROBJ
-LMDB::Core::Stat T_PTROBJ
-LMDB::Core::Cursor    T_PTROBJ
-LMDB::Core::TxnNullable T_PTROBJ_N
+LMDB::Core::Env T_PTR
+LMDB::Core::EnvInfo T_PTR
+LMDB::Core::Txn T_PTR
+LMDB::Core::Stat T_PTR
+LMDB::Core::Cursor T_PTR
+LMDB::Core::TxnNullable T_PTR_N
 MDB_dbi     unsigned int
 MDB_valIn   T_mdb_val_in
 MDB_valInOut   T_mdb_val_in_out
@@ -13,17 +13,13 @@ MDB_cursor_op T_UV
 
 INPUT
 
-T_PTROBJ_N
+T_PTR_N
         if(!SvTRUE($arg)) {
             $var = ($type) NULL;
-        } else if (sv_derived_from($arg, \"LMDB::Core::Txn\")) {
-            IV tmp = SvIV((SV*)SvRV($arg));
-            $var = INT2PTR($type,tmp);
+        } else {
+            $var = INT2PTR($type,SvIV($arg));
         }
-        else
-            Perl_croak(aTHX_ \"%s: %s is not of type %s\",
-                        ${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
-                        \"$var\", \"LMDB::Core::Txn\");
+
 T_mdb_val_in
     if(SvPOK($arg)) {
         $var.mv_data = SvPV($arg, $var.mv_size);
