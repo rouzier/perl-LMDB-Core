@@ -6,7 +6,7 @@
 # change 'tests => 1' to 'tests => last_test_to_print';
 use constant BULK_INSERT => 10;
 
-use Test::More tests => (23 + BULK_INSERT * 6);
+use Test::More tests => (24 + BULK_INSERT * 6);
 use Test::NoWarnings;
 use File::Temp qw(tempdir);
 BEGIN {use_ok('LMDB::Core')}
@@ -14,6 +14,7 @@ use strict;
 use warnings;
 use Errno qw(EACCES);
 use LMDB::Core qw(:all);
+use B;
 
 sub rcmp {$b cmp $a}
 
@@ -34,9 +35,9 @@ my $rc = mdb_env_create(my $env);
 
 is($rc, 0, "mdb_env_create");
 
-BAILOUT("Cannot create mdb environment " . mdb_env_create($rc)) if $rc;
+BAIL_OUT("Cannot create mdb environment " . mdb_env_create($rc)) if $rc;
 
-isa_ok($env, "LMDB::Core::Env", "Isa LMDB::Core::Env");
+#isa_ok($env, "LMDB::Core::Env", "Isa LMDB::Core::Env");
 
 my $tempdb = tempdir(CLEANUP => 1);
 
@@ -44,13 +45,35 @@ $rc = mdb_env_open($env, $tempdb);
 
 is($rc, 0, "mdb_env_open");
 
-BAILOUT("Cannot open mdb db $tempdb " . mdb_env_create($rc)) if $rc;
+BAIL_OUT("Cannot open mdb db $tempdb " . mdb_env_create($rc)) if $rc;
+
+my $test_data = "test";
+
+$rc = mdb_env_set_userctx($env, $test_data);
+
+is($rc, 0, "mdb_env_set_userctx");
+
+is($test_data,mdb_env_get_userctx($env));
+
+$test_data = [qw(test1 test 2)];
+
+$rc = mdb_env_set_userctx($env, $test_data);
+
+is($rc, 0, "mdb_env_set_userctx");
+
+is_deeply($test_data,mdb_env_get_userctx($env));
+
+$rc = mdb_env_set_userctx($env, undef);
+
+is($rc, 0, "mdb_env_set_userctx");
+
+is(undef,mdb_env_get_userctx($env));
 
 $rc = mdb_txn_begin($env, undef, 0, my $txn);
 
 is($rc, 0, "mdb_txn_begin");
 
-isa_ok($txn, "LMDB::Core::Txn", "Isa LMDB::Core::Txn");
+#isa_ok($txn, "LMDB::Core::Txn", "Isa LMDB::Core::Txn");
 
 $rc = mdb_dbi_open($txn, undef, 0, my $dbi);
 
@@ -113,7 +136,7 @@ for (my $i = BULK_INSERT - 1; $i >= 0; $i--) {
 
 is($rc, MDB_NOTFOUND(), "mdb_cursor_get");
 
-isa_ok($cursor, "LMDB::Core::Cursor", "Isa LMDB::Core::Cursor");
+#isa_ok($cursor, "LMDB::Core::Cursor", "Isa LMDB::Core::Cursor");
 my $count = 0;
 
 mdb_reader_list($env,sub { $count++ ; return -1 });
