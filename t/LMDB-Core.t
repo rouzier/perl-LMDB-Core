@@ -6,7 +6,7 @@
 # change 'tests => 1' to 'tests => last_test_to_print';
 use constant BULK_INSERT => 10;
 
-use Test::More tests => (24 + BULK_INSERT * 6);
+use Test::More tests => (26 + BULK_INSERT * 6);
 use Test::NoWarnings;
 use File::Temp qw(tempdir);
 BEGIN {use_ok('LMDB::Core')}
