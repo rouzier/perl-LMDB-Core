@@ -673,7 +673,165 @@ The scalar to store the flags
 
 =head3 RETURN
 
-A non-zero error value on failure and 0 on success. Some possible
+A non-zero error value on failure and 0 on success.
+Some possible errors
+
+=over
+
+=item
+
+EINVAL - an invalid parameter was specified.
+
+=back
+
+=head2 mdb_env_get_path
+
+Return the path that was used in L</mdb_env_open>.
+
+=head3 EXAMPLE
+
+    my $rc = mdb_env_get_path($env, $path);
+
+=head3 PARAMETERS
+
+=over
+
+=item $env
+
+environment handle returned by L</mdb_env_create>
+
+=item $flags
+
+The scalar to store the path
+
+=back
+
+=head3 RETURN
+
+A non-zero error value on failure and 0 on success.
+Some possible errors
+
+=over
+
+=item
+
+EINVAL - an invalid parameter was specified.
+
+=back
+
+=head2 mdb_env_get_fd
+
+Return the file descriptor for an environment
+
+=head3 EXAMPLE
+
+    my $rc = mdb_env_get_fd($env, $fd);
+
+=head3 PARAMETERS
+
+=over
+
+=item $env
+
+environment handle returned by L</mdb_env_create>
+
+=item $flags
+
+The scalar to store the path
+
+=back
+
+=head3 RETURN
+
+A non-zero error value on failure and 0 on success.
+Some possible errors
+
+=over
+
+=item
+
+EINVAL - an invalid parameter was specified.
+
+=back
+
+=head2 mdb_env_set_mapsize
+
+Set the size of the memory map to use for this environment.
+The size should be a multiple of the OS page size.
+This function should be called after L</mdb_env_create> and before L</mdb_env_open>.
+It may be called at later times if no transactions are active in this process.
+Note that the library does not check for this condition,
+the caller must ensure it explicitly.
+If the mapsize is increased by another process, and data has grown
+beyond the range of the current mapsize, L</<mdb_txn_begin> will
+return L</MDB_MAP_RESIZED>.
+This function may be called with a size of zero to adopt the new size.
+Any attempt to set a size smaller than the space already consumed
+by the environment will be silently changed to the current size of the used space.
+
+=head3 EXAMPLE
+
+    my $rc = mdb_env_set_mapsize($env, $size);
+
+=head3 PARAMETERS
+
+=over
+
+=item $env
+
+environment handle returned by L</mdb_env_create>
+
+=item $size
+
+The size of the memory map for the environment
+
+=back
+
+=head3 RETURN
+
+A non-zero error value on failure and 0 on success.
+Some possible errors
+
+=over
+
+=item
+
+EINVAL - an invalid parameter was specified.
+
+=back
+
+=head2 mdb_env_set_maxreaders
+
+This defines the number of slots in the lock table that is used to track readers in the
+the environment. The default is 126.
+Starting a read-only transaction normally ties a lock table slot to the
+current thread until the environment closes or the thread exits. If
+L</MDB_NOTLS> is in use, L</mdb_txn_begin> instead ties the slot to the
+txn object until it or the env object is destroyed.
+This function may only be called after L</mdb_env_create> and before L<mdb_env_open>
+
+=head3 EXAMPLE
+
+    my $rc = mdb_env_set_maxreaders($env, $readers);
+
+=head3 PARAMETERS
+
+=over
+
+=item $env
+
+environment handle returned by L</mdb_env_create>
+
+=item $readers
+
+The maximum number of reader lock table slots
+
+=back
+
+=head3 RETURN
+
+A non-zero error value on failure and 0 on success.
+Some possible errors
 
 =over
 
