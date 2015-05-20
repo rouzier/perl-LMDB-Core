@@ -641,9 +641,7 @@ A non-zero error value on failure and 0 on success. Some possible
 
 =over
 
-=item
-
-EINVAL - an invalid parameter was specified.
+=item EINVAL - an invalid parameter was specified.
 
 =back
 
@@ -678,9 +676,7 @@ Some possible errors
 
 =over
 
-=item
-
-EINVAL - an invalid parameter was specified.
+=item EINVAL - an invalid parameter was specified.
 
 =back
 
@@ -713,9 +709,7 @@ Some possible errors
 
 =over
 
-=item
-
-EINVAL - an invalid parameter was specified.
+=item EINVAL - an invalid parameter was specified.
 
 =back
 
@@ -748,9 +742,7 @@ Some possible errors
 
 =over
 
-=item
-
-EINVAL - an invalid parameter was specified.
+=item EINVAL - an invalid parameter was specified.
 
 =back
 
@@ -763,7 +755,7 @@ It may be called at later times if no transactions are active in this process.
 Note that the library does not check for this condition,
 the caller must ensure it explicitly.
 If the mapsize is increased by another process, and data has grown
-beyond the range of the current mapsize, L</<mdb_txn_begin> will
+beyond the range of the current mapsize, L</mdb_txn_begin> will
 return L</MDB_MAP_RESIZED>.
 This function may be called with a size of zero to adopt the new size.
 Any attempt to set a size smaller than the space already consumed
@@ -794,9 +786,7 @@ Some possible errors
 
 =over
 
-=item
-
-EINVAL - an invalid parameter was specified.
+=item EINVAL - an invalid parameter was specified.
 
 =back
 
@@ -835,9 +825,7 @@ Some possible errors
 
 =over
 
-=item
-
-EINVAL - an invalid parameter was specified.
+=item EINVAL - an invalid parameter was specified.
 
 =back
 
@@ -870,9 +858,7 @@ Some possible errors
 
 =over
 
-=item
-
-EINVAL - an invalid parameter was specified.
+=item EINVAL - an invalid parameter was specified.
 
 =back
 
@@ -910,9 +896,7 @@ Some possible errors
 
 =over
 
-=item
-
-EINVAL - an invalid parameter was specified.
+=item EINVAL - an invalid parameter was specified.
 
 =back
 
@@ -940,7 +924,7 @@ The maximum size of a key we can write
 
 =head2 mdb_env_set_userctx
 
-Set application information associated with L</MDB_env>
+Set application information associated with an environment
 
 =head3 EXAMPLE
 
@@ -966,29 +950,7 @@ A non-zero error value on failure and 0 on success.
 
 =head2 mdb_env_get_userctx
 
-Get the application information associated with L</MDB_env>
-
-=head3 EXAMPLE
-
-    my $ctx = mdb_env_get_userctx($env);
-
-=head3 PARAMETERS
-
-=over
-
-=item $env
-
-environment handle returned by L</mdb_env_create>
-
-=back
-
-=head3 RETURN
-
-The scalar set by mdb_env_set_userctx
-
-=head2 mdb_env_get_userctx
-
-Get the application information associated with L</MDB_env>
+Get the application information associated with an environment
 
 =head3 EXAMPLE
 
@@ -1179,8 +1141,77 @@ A transaction handle returned by L</mdb_txn_begin>
 
 NOTHING
 
+=head2 mdb_txn_reset
+
+Reset a read-only transaction.
+
+Abort the transaction like #mdb_txn_abort(), but keep the transaction
+handle. #mdb_txn_renew() may reuse the handle. This saves allocation
+overhead if the process will start a new read-only transaction soon,
+and also locking overhead if #MDB_NOTLS is in use. The reader table
+lock is released, but the table slot stays tied to its thread or
+#MDB_txn. Use mdb_txn_abort() to discard a reset handle, and to free
+its lock table slot if MDB_NOTLS is in use.
+Cursors opened within the transaction must not be used
+again after this call, except with #mdb_cursor_renew().
+Reader locks generally don't interfere with writers, but they keep old
+versions of database pages allocated. Thus they prevent the old pages
+from being reused when writers commit new data, and so under heavy load
+the database size may grow much more rapidly than otherwise.
+
+=head3 EXAMPLE
+
+    mdb_txn_reset($txn)
+
+=head3 PARAMETERS
+
+=over
+
+=item $txn
+
+A transaction handle returned by L</mdb_txn_begin>
+
 =back
 
+=head3 RETURN
+
+NOTHING
+
+=head2 mdb_txn_renew
+
+brief Renew a read-only transaction.
+
+This acquires a new reader lock for a transaction handle that had been
+released by #mdb_txn_reset(). It must be called before a reset transaction
+may be used again.
+
+
+=head3 EXAMPLE
+
+    my $rc = mdb_txn_renew($txn)
+
+=head3 PARAMETERS
+
+=over
+
+=item $txn
+
+A transaction handle returned by L</mdb_txn_begin>
+
+=back
+
+=head3 RETURN
+
+A non-zero error value on failure and 0 on success.
+Some possible errors are
+
+=over
+
+=item MDB_PANIC - a fatal error occurred earlier and the environment
+
+=item EINVAL - an invalid parameter was specified.
+
+=back
 
 =head1 CURSOR OPERATIONS
 
