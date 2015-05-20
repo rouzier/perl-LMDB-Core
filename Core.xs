@@ -173,9 +173,9 @@ INCLUDE: const-xs.inc
 
 char *
 mdb_version(major, minor, patch)
-    int &major = NO_INIT
-    int &minor = NO_INIT
-    int &patch = NO_INIT
+    int &major = 0;
+    int &minor = 0;
+    int &patch = 0;
 OUTPUT:
     major
     minor
@@ -261,21 +261,21 @@ mdb_env_set_flags(env, flags, onoff)
 int
 mdb_env_get_flags(env, flags)
 	LMDB::Core::Env   env
-	unsigned int &flags = NO_INIT
+	unsigned int &flags = 0;
     OUTPUT:
 	flags
 
 int
 mdb_env_get_path(env, path)
 	LMDB::Core::Env   env
-	const char * &path = NO_INIT
+	const char * &path = NULL;
     OUTPUT:
 	path
 
 int
 mdb_env_get_fd(env, fd)
     LMDB::Core::Env   env
-    int &fd = NO_INIT
+    int &fd = -1;
     OUTPUT:
     fd
 
@@ -292,7 +292,7 @@ mdb_env_set_maxreaders(env, readers)
 int
 mdb_env_get_maxreaders(env, readers)
 	LMDB::Core::Env   env
-	unsigned int &readers = NO_INIT
+	unsigned int &readers = 0;
     OUTPUT:
 	readers
 
@@ -380,7 +380,7 @@ mdb_dbi_open(txn, name, flags, dbi)
 	LMDB::Core::Txn   txn
 	const char * name = SvOK($arg) ? (const char *)SvPV_nolen($arg) : NULL;
 	unsigned	flags
-	unsigned int &dbi = NO_INIT
+	unsigned int &dbi = 0;
 OUTPUT:
 	dbi
 
@@ -401,7 +401,7 @@ int
 mdb_dbi_flags(txn, dbi, flags);
 	LMDB::Core::Txn   txn
     int dbi
-    unsigned int &flags = NO_INIT
+    unsigned int &flags = 0;
 OUTPUT:
     flags
 
@@ -615,7 +615,7 @@ mdb_cursor_del(cursor, flags = 0)
 int
 mdb_cursor_count(cursor, count)
 	LMDB::Core::Cursor	cursor
-	size_t  &count = NO_INIT
+	size_t  &count = 0;
 OUTPUT:
 	count
 
@@ -645,5 +645,5 @@ OUTPUT:
 int
 mdb_reader_check(env, dead)
     LMDB::Core::Env env
-    int &dead = NO_INIT
+    int &dead = 0;
 
