@@ -841,6 +841,347 @@ EINVAL - an invalid parameter was specified.
 
 =back
 
+=head2 mdb_env_get_maxreaders
+
+Get the maximum number of threads/reader slots for the environment.
+
+=head3 EXAMPLE
+
+    my $rc = mdb_env_get_maxreaders($env, $readers);
+
+=head3 PARAMETERS
+
+=over
+
+=item $env
+
+environment handle returned by L</mdb_env_create>
+
+=item $readers
+
+The scalar to store the number readers for the environment
+
+=back
+
+=head3 RETURN
+
+A non-zero error value on failure and 0 on success.
+Some possible errors
+
+=over
+
+=item
+
+EINVAL - an invalid parameter was specified.
+
+=back
+
+=head2 mdb_env_set_maxdbs
+
+Set the maximum number of named databases for the environment.
+
+This function is only needed if multiple databases will be used in the
+environment. Simpler applications that use the environment as a single
+unnamed database can ignore this option.
+This function may only be called after L</mdb_env_create> and before L</mdb_env_open>
+
+=head3 EXAMPLE
+
+    my $rc = mdb_env_set_maxdbs($env, $maxdbs);
+
+=head3 PARAMETERS
+
+=over
+
+=item $env
+
+environment handle returned by L</mdb_env_create>
+
+=item $maxdbs
+
+The max number of dbs to open in this environment
+
+=back
+
+=head3 RETURN
+
+A non-zero error value on failure and 0 on success.
+Some possible errors
+
+=over
+
+=item
+
+EINVAL - an invalid parameter was specified.
+
+=back
+
+=head2 mdb_env_get_maxkeysize
+
+Get the maximum size of keys and L</MDB_DUPSORT> data we can write.
+
+=head3 EXAMPLE
+
+    my $keysize = mdb_env_get_maxkeysize($env);
+
+=head3 PARAMETERS
+
+=over
+
+=item $env
+
+environment handle returned by L</mdb_env_create>
+
+=back
+
+=head3 RETURN
+
+The maximum size of a key we can write
+
+=head2 mdb_env_set_userctx
+
+Set application information associated with L</MDB_env>
+
+=head3 EXAMPLE
+
+    my $rc = mdb_env_set_userctx($env, $ctx);
+
+=head3 PARAMETERS
+
+=over
+
+=item $env
+
+environment handle returned by L</mdb_env_create>
+
+=item $ctx
+
+A scalar value to associate with the env
+
+=back
+
+=head3 RETURN
+
+A non-zero error value on failure and 0 on success.
+
+=head2 mdb_env_get_userctx
+
+Get the application information associated with L</MDB_env>
+
+=head3 EXAMPLE
+
+    my $ctx = mdb_env_get_userctx($env);
+
+=head3 PARAMETERS
+
+=over
+
+=item $env
+
+environment handle returned by L</mdb_env_create>
+
+=back
+
+=head3 RETURN
+
+The scalar set by mdb_env_set_userctx
+
+=head2 mdb_env_get_userctx
+
+Get the application information associated with L</MDB_env>
+
+=head3 EXAMPLE
+
+    my $ctx = mdb_env_get_userctx($env);
+
+=head3 PARAMETERS
+
+=over
+
+=item $env
+
+environment handle returned by L</mdb_env_create>
+
+=back
+
+=head3 RETURN
+
+The scalar set by mdb_env_set_userctx
+
+=head2 mdb_txn_begin
+
+Create a transaction for use with the environment.
+The transaction handle may be discarded using L</mdb_txn_abort> or L</mdb_txn_commit>
+A transaction and its cursors must only be used by a single
+thread, and a thread may only have a single transaction at a time.
+If #MDB_NOTLS is in use, this does not apply to read-only transactions.
+Cursors may not span transactions.
+
+=head3 EXAMPLE
+
+    my $rc = mdb_txn_begin($env, $parent, $flags, $txn)
+
+=head3 PARAMETERS
+
+=over
+
+=item $env - An environment handle returned by #mdb_env_create()
+
+=item $parent - undef or the parent transaction of the new transaction.
+
+Transactions may be nested to any level.
+A parent transaction and its cursors may not issue any other operations than
+mdb_txn_commit and mdb_txn_abort while it has active child transactions.
+
+=item $flags - Transaction options OR'ed for this transaction.
+
+=over
+
+=item MDB_RDONLY
+
+=item MDB_NOSYNC
+
+=item MDB_NOMETASYNC
+
+=back
+
+=item $txn - Where the new txn handle will be stored
+
+=back
+
+=head3 RETURN
+
+A non-zero error value on failure and 0 on success.
+Some possible errors are:
+
+=over
+
+=item MDB_PANIC
+
+A fatal error occurred earlier and the environment must be shut down.
+
+=item MDB_MAP_RESIZED
+
+Another process wrote data beyond this MDB_env's
+mapsize and this environment's map must be resized as well.
+See L</mdb_env_set_mapsize>
+
+=item MDB_READERS_FULL
+
+A read-only transaction was requested and the reader lock table is full.
+See L</mdb_env_set_maxreaders>
+
+=item ENOMEM
+
+Out of memory.
+
+=back
+
+=head2 mdb_txn_env
+
+=head3 EXAMPLE
+
+    my $env = mdb_txn_env($txn)
+
+=head3 PARAMETERS
+
+=over
+
+=item $txn
+
+A transaction handle returned by L</mdb_txn_begin>
+
+=back
+
+=head3 RETURN
+
+Returns the transaction environment
+
+=head2 mdb_txn_id
+
+=head3 EXAMPLE
+
+    my $id = mdb_txn_id($txn)
+
+=head3 PARAMETERS
+
+=over
+
+=item $txn
+
+A transaction handle returned by L</mdb_txn_begin>
+
+=back
+
+=head3 RETURN
+
+Return the transaction ID
+
+=head2 mdb_txn_commit
+
+Commit all the operations of a transaction into the database.
+The transaction handle is freed. It and its cursors must not be used
+again after this call, except with #mdb_cursor_renew().
+Only write-transactions free cursors.
+
+=head3 EXAMPLE
+
+    my $rc = mdb_txn_commit($txn)
+
+=head3 PARAMETERS
+
+=over
+
+=item $txn
+
+A transaction handle returned by L</mdb_txn_begin>
+
+=back
+
+=head3 RETURN
+
+A non-zero error value on failure and 0 on success.
+Some possible errors are:
+
+=over
+
+=item EINVAL - an invalid parameter was specified.
+
+=item ENOSPC - no more disk space.
+
+=item EIO - a low-level I/O error occurred while writing.
+
+=item ENOMEM - out of memory.
+
+=back
+
+=head2 mdb_txn_abort
+
+Abandon all the operations of the transaction instead of saving them.
+The transaction handle is freed. It and its cursors must not be used
+again after this call, except with #mdb_cursor_renew().
+
+=head3 EXAMPLE
+
+    mdb_txn_abort($txn)
+
+=head3 PARAMETERS
+
+=over
+
+=item $txn
+
+A transaction handle returned by L</mdb_txn_begin>
+
+=back
+
+=head3 RETURN
+
+NOTHING
+
+=back
+
+
 =head1 CURSOR OPERATIONS
 
 =head2 MDB_FIRST
