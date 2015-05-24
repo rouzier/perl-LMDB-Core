@@ -15,9 +15,9 @@
 # define SvTRULYREADONLY(sv) (SvREADONLY(sv) && !SvIsCOW(sv))
 #endif
 
-typedef	MDB_env*    LMDB__Core__Env;
-typedef	MDB_envinfo*    LMDB__Core__EnvInfo;
-typedef	MDB_txn*    LMDB__Core__Txn;
+typedef MDB_env*    LMDB__Core__Env;
+typedef MDB_envinfo*    LMDB__Core__EnvInfo;
+typedef MDB_txn*    LMDB__Core__Txn;
 typedef MDB_txn*    LMDB__Core__TxnNullable;
 typedef MDB_cursor* LMDB__Core__Cursor;
 typedef MDB_stat*   LMDB__Core__Stat;
@@ -66,7 +66,7 @@ static int  LMDB_Core_cmp(const MDB_val *a, const MDB_val *b, void * ctx) {
     return ret;
 }
 
-MODULE = LMDB::Core		PACKAGE = LMDB::Core::EnvInfo
+MODULE = LMDB::Core PACKAGE = LMDB::Core::EnvInfo
 
 void* mapaddr(envinfo)
     LMDB::Core::EnvInfo envinfo
@@ -76,46 +76,46 @@ OUTPUT:
     RETVAL
 
 size_t mapsize(envinfo)
-	LMDB::Core::EnvInfo envinfo
+    LMDB::Core::EnvInfo envinfo
 CODE:
-	RETVAL = envinfo->me_mapsize;
+    RETVAL = envinfo->me_mapsize;
 OUTPUT:
-	RETVAL
+    RETVAL
 
 size_t last_pgno(envinfo)
-	LMDB::Core::EnvInfo envinfo
+    LMDB::Core::EnvInfo envinfo
 CODE:
-	RETVAL = envinfo->me_last_pgno;
+    RETVAL = envinfo->me_last_pgno;
 OUTPUT:
-	RETVAL
+    RETVAL
 
 size_t last_txnid(envinfo)
-	LMDB::Core::EnvInfo envinfo
+    LMDB::Core::EnvInfo envinfo
 CODE:
-	RETVAL = envinfo->me_last_txnid;
+    RETVAL = envinfo->me_last_txnid;
 OUTPUT:
-	RETVAL
+    RETVAL
 
 unsigned int maxreaders(envinfo)
-	LMDB::Core::EnvInfo envinfo
+    LMDB::Core::EnvInfo envinfo
 CODE:
-	RETVAL = envinfo->me_maxreaders;
+    RETVAL = envinfo->me_maxreaders;
 OUTPUT:
-	RETVAL
+    RETVAL
 
 unsigned int numreaders(envinfo)
-	LMDB::Core::EnvInfo envinfo
+    LMDB::Core::EnvInfo envinfo
 CODE:
-	RETVAL = envinfo->me_numreaders;
+    RETVAL = envinfo->me_numreaders;
 OUTPUT:
-	RETVAL
+    RETVAL
 
 void DESTROY(envinfo)
-	LMDB::Core::EnvInfo envinfo
+    LMDB::Core::EnvInfo envinfo
 CODE:
     Safefree(envinfo);
 
-MODULE = LMDB::Core		PACKAGE = LMDB::Core::Stat
+MODULE = LMDB::Core PACKAGE = LMDB::Core::Stat
 
 unsigned int psize(stat)
     LMDB::Core::Stat stat
@@ -165,7 +165,7 @@ void DESTROY(stat)
     Safefree(stat);
 
 
-MODULE = LMDB::Core		PACKAGE = LMDB::Core		
+MODULE = LMDB::Core PACKAGE = LMDB::Core
 PROTOTYPES: DISABLE
 
 INCLUDE: const-xs.inc
@@ -187,36 +187,36 @@ mdb_strerror(err)
 
 int
 mdb_env_create(env)
-	LMDB::Core::Env   &env = NULL;
+    LMDB::Core::Env   &env = NULL;
 OUTPUT:
-	env
+    env
 
 int
 mdb_env_open(env, path, flags = 0, mode = 0660)
-	LMDB::Core::Env   env
-	const char *	path
-	unsigned flags
-	int	mode
+    LMDB::Core::Env   env
+    const char *    path
+    unsigned flags
+    int mode
 
 int
 mdb_env_copy(env, path, flags = 0)
-	LMDB::Core::Env   env
-	const char *	path
-	unsigned int flags
+    LMDB::Core::Env   env
+    const char *    path
+    unsigned int flags
 CODE:
-	RETVAL = mdb_env_copy2(env, path, flags);
+    RETVAL = mdb_env_copy2(env, path, flags);
 OUTPUT:
-	RETVAL
+    RETVAL
 
 int
 mdb_env_copyfd(env, fd, flags = 0)
-	LMDB::Core::Env   env
-	int  fd
-	unsigned flags
+    LMDB::Core::Env   env
+    int  fd
+    unsigned flags
 CODE:
-	RETVAL = mdb_env_copyfd2(env, fd, flags);
+    RETVAL = mdb_env_copyfd2(env, fd, flags);
 OUTPUT:
-	RETVAL
+    RETVAL
 
 
 int
@@ -245,32 +245,32 @@ OUTPUT:
 
 int
 mdb_env_sync(env, force=0)
-	LMDB::Core::Env   env
-	int	force
+    LMDB::Core::Env   env
+    bool force
 
 void
 mdb_env_close(env)
-	LMDB::Core::Env   env
+    LMDB::Core::Env   env
 
 int
 mdb_env_set_flags(env, flags, onoff)
-	LMDB::Core::Env   env
-	unsigned int	flags
-	int	onoff
+    LMDB::Core::Env   env
+    unsigned int flags
+    bool onoff
 
 int
 mdb_env_get_flags(env, flags)
-	LMDB::Core::Env   env
-	unsigned int &flags = 0;
+    LMDB::Core::Env   env
+    unsigned int &flags = 0;
     OUTPUT:
-	flags
+    flags
 
 int
 mdb_env_get_path(env, path)
-	LMDB::Core::Env   env
-	const char * &path = NULL;
+    LMDB::Core::Env   env
+    const char * &path = NULL;
     OUTPUT:
-	path
+    path
 
 int
 mdb_env_get_fd(env, fd)
@@ -281,29 +281,29 @@ mdb_env_get_fd(env, fd)
 
 int
 mdb_env_set_mapsize(env, size)
-	LMDB::Core::Env   env
-	size_t	size
+    LMDB::Core::Env   env
+    size_t size
 
 int
 mdb_env_set_maxreaders(env, readers)
-	LMDB::Core::Env   env
-	unsigned int	readers
+    LMDB::Core::Env   env
+    unsigned int readers
 
 int
 mdb_env_get_maxreaders(env, readers)
-	LMDB::Core::Env   env
-	unsigned int &readers = 0;
+    LMDB::Core::Env   env
+    unsigned int &readers = 0;
     OUTPUT:
-	readers
+    readers
 
 int
 mdb_env_set_maxdbs(env, dbs)
-	LMDB::Core::Env   env
-	int	dbs
+    LMDB::Core::Env   env
+    int dbs
 
 int
 mdb_env_get_maxkeysize(env)
-	LMDB::Core::Env   env
+    LMDB::Core::Env   env
 
 int
 mdb_env_set_userctx(env, ctx)
@@ -342,34 +342,34 @@ int  mdb_env_set_assert(MDB_env *env, MDB_assert_func *func);
 
 int
 mdb_txn_begin(env, parent, flags, txn)
-	LMDB::Core::Env   env
-	LMDB::Core::TxnNullable parent
-	unsigned    flags
-	LMDB::Core::Txn   &txn = NULL;
+    LMDB::Core::Env   env
+    LMDB::Core::TxnNullable parent
+    unsigned    flags
+    LMDB::Core::Txn   &txn = NULL;
 OUTPUT:
-	txn
+    txn
 
 LMDB::Core::Env
 mdb_txn_env(txn)
-	LMDB::Core::Txn   txn
+    LMDB::Core::Txn   txn
 POSTCALL:
     if (RETVAL == NULL)
         XSRETURN_UNDEF;
 
 size_t
 mdb_txn_id(txn)
-	LMDB::Core::Txn   txn
+    LMDB::Core::Txn   txn
 
 int
 interface_int_txn(txn)
-	LMDB::Core::Txn   txn
+    LMDB::Core::Txn   txn
 INTERFACE:
 mdb_txn_commit
 mdb_txn_renew
 
 void
 interface_void_txn(txn)
-	LMDB::Core::Txn   txn
+    LMDB::Core::Txn   txn
 INTERFACE:
 mdb_txn_abort
 mdb_txn_reset
@@ -377,16 +377,16 @@ mdb_txn_reset
 
 int
 mdb_dbi_open(txn, name, flags, dbi)
-	LMDB::Core::Txn   txn
-	const char * name = SvOK($arg) ? (const char *)SvPV_nolen($arg) : NULL;
-	unsigned	flags
-	unsigned int &dbi = 0;
+    LMDB::Core::Txn   txn
+    const char * name = SvOK($arg) ? (const char *)SvPV_nolen($arg) : NULL;
+    unsigned flags
+    unsigned int &dbi = 0;
 OUTPUT:
-	dbi
+    dbi
 
 int
 mdb_stat(txn, dbi, stat);
-	LMDB::Core::Txn   txn
+    LMDB::Core::Txn   txn
     int dbi
     LMDB::Core::Stat stat = NO_INIT
 INIT:
@@ -399,7 +399,7 @@ OUTPUT:
 
 int
 mdb_dbi_flags(txn, dbi, flags);
-	LMDB::Core::Txn   txn
+    LMDB::Core::Txn   txn
     int dbi
     unsigned int &flags = 0;
 OUTPUT:
@@ -407,14 +407,14 @@ OUTPUT:
 
 void
 mdb_dbi_close (env, dbi)
-	LMDB::Core::Env   env
-	unsigned int	dbi
+    LMDB::Core::Env   env
+    unsigned int dbi
 
 int
 mdb_drop(txn, dbi, del = 0)
-	LMDB::Core::Txn txn
-	unsigned int	dbi
-    int del
+    LMDB::Core::Txn txn
+    unsigned int dbi
+    bool del
 
 int
 mdb_set_compare(txn, dbi, cmp) 
@@ -566,29 +566,29 @@ mdb_del(txn, dbi, key, data)
 
 int
 mdb_cursor_open(txn, dbi, cursor)
-	LMDB::Core::Txn   txn
-	unsigned int	dbi
-	LMDB::Core::Cursor	&cursor = NULL;
+    LMDB::Core::Txn   txn
+    unsigned int dbi
+    LMDB::Core::Cursor &cursor = NULL;
 OUTPUT:
-	cursor
+    cursor
 
 void
 mdb_cursor_close(cursor)
-	LMDB::Core::Cursor	cursor
+    LMDB::Core::Cursor cursor
 
 int
 mdb_cursor_renew(txn, cursor)
-	LMDB::Core::Txn   txn
-	LMDB::Core::Cursor	cursor
+    LMDB::Core::Txn   txn
+    LMDB::Core::Cursor cursor
 
 LMDB::Core::Txn
 mdb_cursor_txn(cursor)
-	LMDB::Core::Cursor	cursor
+    LMDB::Core::Cursor cursor
 
 
 unsigned int
 mdb_cursor_dbi(cursor)
-	LMDB::Core::Cursor	cursor
+    LMDB::Core::Cursor cursor
 
 int
 mdb_cursor_get(cursor, key, data, MDB_cursor_op op)
@@ -602,33 +602,33 @@ OUTPUT:
 
 int
 mdb_cursor_put(cursor, key, data, flags)
-	LMDB::Core::Cursor	cursor
+    LMDB::Core::Cursor cursor
     MDB_valIn &key
     MDB_valIn &data
     unsigned int flags
 
 int
 mdb_cursor_del(cursor, flags = 0)
-	LMDB::Core::Cursor	cursor
-	unsigned		flags
+    LMDB::Core::Cursor cursor
+    unsigned flags
 
 int
 mdb_cursor_count(cursor, count)
-	LMDB::Core::Cursor	cursor
-	size_t  &count = 0;
+    LMDB::Core::Cursor cursor
+    size_t  &count = 0;
 OUTPUT:
-	count
+    count
 
 int
 mdb_cmp(txn, dbi, a, b)
-	LMDB::Core::Txn   txn
+    LMDB::Core::Txn   txn
     unsigned int dbi
     MDB_valIn   &a
     MDB_valIn   &b
 
 int
 mdb_dcmp(txn, dbi, a, b)
-	LMDB::Core::Txn   txn
+    LMDB::Core::Txn   txn
     unsigned int dbi
     MDB_valIn   &a
     MDB_valIn   &b
