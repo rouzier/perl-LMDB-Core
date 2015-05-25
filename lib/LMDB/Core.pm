@@ -1213,6 +1213,298 @@ Some possible errors are
 
 =back
 
+=head2 mdb_dbi_open
+
+A database handle denotes the name and parameters of a database,
+independently of whether such a database exists.
+The database handle may be discarded by calling #mdb_dbi_close().
+The old database handle is returned if the database was already open.
+The handle may only be closed once.
+
+The database handle will be private to the current transaction until
+the transaction is successfully committed. If the transaction is
+aborted the handle will be closed automatically.
+After a successful commit the handle will reside in the shared
+environment, and may be used by other transactions.
+
+This function must not be called from multiple concurrent
+transactions in the same process. A transaction that uses
+this function must finish (either commit or abort) before
+any other transaction in the process may use this function.
+
+To use named databases (with name != undef), L</mdb_env_set_maxdbs>
+must be called before opening the environment.  Database names
+are kept as keys in the unnamed database.
+
+=head3 EXAMPLE
+
+    my $rc = mdb_dbi_open($txn, $name, $flags, $dbi);
+
+=head3 PARAMETERS
+
+=over
+
+=item $txn - A transaction handle returned by #mdb_txn_begin()
+
+=item $name - The name of the database to open.
+      If only a single 	database is needed in the environment, this value may be undef
+
+=item $flags - Special options for this database. This parameter must be set to 0 or by bitwise OR'ing together one or more of the following
+
+=over
+
+=item MDB_REVERSEKEY
+
+Keys are strings to be compared in reverse order, from the end
+of the strings to the beginning. By default, Keys are treated as strings and
+compared from beginning to end.
+
+=item MDB_DUPSORT
+
+Duplicate keys may be used in the database. (Or, from another perspective,
+keys may have multiple data items, stored in sorted order.) By default
+keys must be unique and may have only a single data item.
+
+=item MDB_INTEGERKEY
+
+Keys are binary integers in native byte order. Setting this option
+requires all keys to be the same size, typically sizeof(int)
+or sizeof(size_t).
+
+=item MDB_DUPFIXED
+
+This flag may only be used in combination with #MDB_DUPSORT. This option
+tells the library that the data items for this database are all the same
+size, which allows further optimizations in storage and retrieval. When
+all data items are the same size, the #MDB_GET_MULTIPLE and #MDB_NEXT_MULTIPLE
+cursor operations may be used to retrieve multiple items at once.
+
+=item MDB_INTEGERDUP
+
+This option specifies that duplicate data items are also integers, and
+should be sorted as such.
+
+=item MDB_REVERSEDUP
+
+This option specifies that duplicate data items should be compared as
+strings in reverse order.
+
+=item MDB_CREATE
+
+Create the named database if it doesn't exist. This option is not
+allowed in a read-only transaction or a read-only environment.
+
+=back
+
+=item $dbi - where the new dbi handle will be stored
+
+=back
+
+=head3 RETURN
+
+A non-zero error value on failure and 0 on success. Some possible
+errors are:
+
+=over
+
+=item MDB_NOTFOUND - the specified database doesn't exist in the environment and L</MDB_CREATE> was not specified.
+
+=item L</MDB_DBS_FULL> - too many databases have been opened. See #mdb_env_set_maxdbs().
+
+=back
+
+=head2 mdb_stat
+
+Retrieve statistics for a database.
+
+=head3 EXAMPLE
+
+    my $rc = mdb_stat($txn, $dbi, $stat);
+
+=head3 PARAMETERS
+
+=over
+
+=item $txn A transaction handle returned by #mdb_txn_begin()
+
+=item $dbi A database handle returned by #mdb_dbi_open()
+
+=item $stat The address of an #MDB_stat structure where the statistics will be copied
+
+=back
+
+=head3 RETURN
+
+return A non-zero error value on failure and 0 on success. Some possible
+errors are:
+
+=over
+
+=item EINVAL - an invalid parameter was specified.
+
+=back
+
+=head2 mdb_dbi_flags
+
+Retrieve the DB flags for a database handle.
+
+=head3 EXAMPLE
+
+    my $rc = mdb_dbi_flags($txn, $dbi, $flags);
+
+=head3 PARAMETERS
+
+=over
+
+=item $txn A transaction handle returned by #mdb_txn_begin()
+
+=item $dbi A database handle returned by #mdb_dbi_open()
+
+=item $flags Address where the flags will be returned.
+
+=back
+
+=head3 RETURN
+
+A non-zero error value on failure and 0 on success.
+
+=head2 mdb_dbi_close
+
+Close a database handle. Normally unnecessary. Use with care:
+This call is not mutex protected. Handles should only be closed by
+a single thread, and only if no other threads are going to reference
+the database handle or one of its cursors any further. Do not close
+a handle if an existing transaction has modified its database.
+Doing so can cause misbehavior from database corruption to errors
+like MDB_BAD_VALSIZE (since the DB name is gone).
+
+Closing a database handle is not necessary, but lets #mdb_dbi_open()
+reuse the handle value.  Usually it's better to set a bigger
+#mdb_env_set_maxdbs(), unless that value would be large.
+
+=head3 EXAMPLE
+
+    my $rc = mdb_dbi_close($env ,$dbi);
+
+=head3 PARAMETERS
+
+=over
+
+=item $env An environment handle returned by #mdb_env_create()
+
+=item $dbi A database handle returned by #mdb_dbi_open()
+
+=back
+
+=head3 RETURN
+
+A non-zero error value on failure and 0 on success.
+
+=head2 mdb_drop
+
+Empty or delete+close a database.
+See L</mdb_dbi_close> for restrictions about closing the DB handle.
+
+=head3 EXAMPLE
+
+    my $rc = mdb_drop(MDB_txn *txn, MDB_dbi dbi, int del);
+
+=head3 PARAMETERS
+
+=over
+
+=item $txn A transaction handle returned by #mdb_txn_begin()
+
+=item $dbi A database handle returned by #mdb_dbi_open()
+
+=item $del 0 to empty the DB, 1 to delete it from the environment and close the DB handle.
+
+=back
+
+=head3 RETURN
+
+A non-zero error value on failure and 0 on success.
+
+=head2 mdb_set_compare
+
+Set a custom key comparison function for a database.
+The comparison function is called whenever it is necessary to compare a
+key specified by the application with a key currently stored in the database.
+If no comparison function is specified, and no special key flags were specified
+with #mdb_dbi_open(), the keys are compared lexically, with shorter keys collating
+before longer keys.
+B<warning> This function must be called before any data access functions are used,
+otherwise data corruption may occur. The same comparison function must be used by every
+program accessing the database, every time the database is used.
+
+=head3 EXAMPLE
+
+    my $rc = mdb_set_compare($txn, $dbi, $cmp);
+
+=head3 PARAMETERS
+
+=over
+
+=item $txn A transaction handle returned by #mdb_txn_begin()
+
+=item $dbi A database handle returned by #mdb_dbi_open()
+
+=item $cmp A #MDB_cmp_func function
+
+=back
+
+=head3 RETURN
+
+A non-zero error value on failure and 0 on success.
+Some possible errors are:
+
+=over
+
+=item EINVAL - an invalid parameter was specified.
+
+=back
+
+=head2 mdb_set_dupsort
+
+Set a custom data comparison function for a #MDB_DUPSORT database.
+This comparison function is called whenever it is necessary to compare a data
+item specified by the application with a data item currently stored in the database.
+This function only takes effect if the database was opened with the #MDB_DUPSORT
+flag.
+If no comparison function is specified, and no special key flags were specified
+with #mdb_dbi_open(), the data items are compared lexically, with shorter items collating
+before longer items.
+B<warning> This function must be called before any data access functions are used,
+otherwise data corruption may occur. The same comparison function must be used by every
+program accessing the database, every time the database is used.
+
+=head3 EXAMPLE
+
+    my $rc = mdb_set_compare($txn, $dbi, $cmp);
+
+=head3 PARAMETERS
+
+=over
+
+=item $txn A transaction handle returned by #mdb_txn_begin()
+
+=item $dbi A database handle returned by #mdb_dbi_open()
+
+=item $cmp A #MDB_cmp_func function
+
+=back
+
+=head3 RETURN
+
+A non-zero error value on failure and 0 on success.
+Some possible errors are:
+
+=over
+
+=item EINVAL - an invalid parameter was specified.
+
+=back
+
 =head1 CURSOR OPERATIONS
 
 =head2 MDB_FIRST
