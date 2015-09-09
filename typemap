@@ -1,9 +1,9 @@
 TYPEMAP
 
 LMDB::Core::Env T_PTR
-LMDB::Core::EnvInfo T_PTR
+LMDB::Core::EnvInfo T_PTROBJ
 LMDB::Core::Txn T_PTR
-LMDB::Core::Stat T_PTR
+LMDB::Core::Stat T_PTROBJ
 LMDB::Core::Cursor T_PTR
 LMDB::Core::TxnNullable T_PTR_N
 MDB_dbi     unsigned int
