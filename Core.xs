@@ -24,6 +24,47 @@ typedef MDB_stat*   LMDB__Core__Stat;
 typedef MDB_val     MDB_valIn;
 typedef MDB_val*    MDB_valInOut;
 
+#define lmdb_core_read NULL
+#define lmdb_core_write NULL
+#define lmdb_core_len NULL
+#define lmdb_core_clear NULL
+#define lmdb_core_copy NULL
+#define lmdb_core_dup NULL
+#define lmdb_core_local NULL
+
+static int
+lmdb_core_free (pTHX_ SV * var, MAGIC * magic) {
+  SvREADONLY_off (var);
+  SvPV_free (var);
+  SvPVX (var) = NULL;
+  SvCUR (var) = 0;
+  return 0;
+}
+
+#ifdef MGf_LOCAL
+
+  #define lmdb_core_local_tail , lmdb_core_local
+  #else
+  #define lmdb_core_local_tail
+
+#endif
+
+static MGVTBL
+lmdb_core_table  = { lmdb_core_read, lmdb_core_write, lmdb_core_len, lmdb_core_clear, lmdb_core_free,  lmdb_core_copy, lmdb_core_dup lmdb_core_local_tail };
+
+#define _MAKE_IT_MAGICAL(out,val) \
+        if(!SvPOK(out)) {\
+            sv_setpvn(out,"",0);\
+        }\
+        sv_magicext(out, NULL, PERL_MAGIC_uvar, &lmdb_core_table, (const char*) NULL, 0);\
+        SvPV_free(out);\
+        SvPVX(out) = val.mv_data;\
+        SvLEN(out) = 0;\
+        SvCUR(out) = val.mv_size;\
+        SvUTF8_off(out);\
+        SvREADONLY_on(out);\
+        SvTAINTED_on(out);
+
 static int LMDB_Core_msg_func(const char *msg, void *ctx) {
     int count;
     SV* method = (SV*) ctx;
