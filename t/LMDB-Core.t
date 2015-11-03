@@ -4,7 +4,7 @@
 #########################
 
 # change 'tests => 1' to 'tests => last_test_to_print';
-use constant BULK_INSERT => 10;
+use constant BULK_INSERT => 100;
 
 use Test::More tests => (26 + BULK_INSERT * 6);
 use Test::NoWarnings;
@@ -47,6 +47,8 @@ is($rc, 0, "mdb_env_open");
 
 BAIL_OUT("Cannot open mdb db $tempdb " . mdb_env_create($rc)) if $rc;
 
+mdb_env_set_mapsize($env, 100*1024*1024);
+
 my $test_data = "test";
 
 $rc = mdb_env_set_userctx($env, $test_data);
@@ -84,8 +86,8 @@ $rc = mdb_set_compare($txn, $dbi, sub {$b cmp $a});
 is($rc, 0, "mdb_set_compare");
 
 for (my $i = 0; $i < BULK_INSERT; $i++) {
-    my $key = "key_$i";
-    my $val = "val_$i";
+    my $key = sprintf("key_%03d",$i);
+    my $val = sprintf("val_%03d",$i);
     $rc = mdb_put($txn, $dbi, $key, $val);
     is($rc, 0, "mdb_put $key = $val");
 }
@@ -94,7 +96,6 @@ $rc = mdb_txn_commit($txn);
 
 is($rc, 0, "mdb_txn_commit");
 
-
 $rc = mdb_txn_begin($env, undef, MDB_RDONLY(), $txn);
 
 is($rc, 0, "mdb_txn_begin MDB_RDONLY");
@@ -102,8 +103,8 @@ is($rc, 0, "mdb_txn_begin MDB_RDONLY");
 $rc = mdb_get($txn, $dbi, "key_1", undef);
 
 for (my $i = 0; $i < BULK_INSERT; $i++) {
-    my $key  = "key_$i";
-    my $val  = "val_$i";
+    my $key = sprintf("key_%03d",$i);
+    my $val = sprintf("val_%03d",$i);
     my $data = '';
     $rc = mdb_get($txn, $dbi, $key, $data);
     is($rc,   0,    "mdb_get $key is success");
@@ -127,8 +128,8 @@ is($rc, 0, "mdb_cursor_get FIRST");
 
 for (my $i = BULK_INSERT - 1; $i >= 0; $i--) {
     is($rc, 0, "mdb_cursor_get");
-    my $test_key = "key_$i";
-    my $test_val = "val_$i";
+    my $test_key = sprintf("key_%03d",$i);
+    my $test_val = sprintf("val_%03d",$i);
     is($key,$test_key,  "Insert order key");
     is($data,$test_val, "Insert order val");
     $rc = mdb_cursor_get($cursor, $key, $data, MDB_NEXT());
